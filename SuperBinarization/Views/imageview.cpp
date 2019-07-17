@@ -124,7 +124,7 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
 
     QPointF point = transformCoordinates(event->pos());
 
-//    if (!rect().contains(point))
+//    if (image.rect().contains(point.toPoint()))
 //    {
 //        return;
 //    }
@@ -137,18 +137,18 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
              {
                  scene.removeItem(tempRect);
              }
-             qreal width = std::abs(previousPoint.x() - point.x());
-             qreal height = std::abs(previousPoint.y() - point.y());
-             QPoint tl;
-             qreal x = std::min(previousPoint.x(),point.x());
-             qreal y = std::max(previousPoint.y(),point.y());
-             QRectF rectf(x,y,width,height);
+//             qreal width = std::abs(previousPoint.x() - point.x());
+//             qreal height = std::abs(previousPoint.y() - point.y());
+//             QPoint tl;
+//             qreal x = std::min(previousPoint.x(),point.x());
+//             qreal y = std::max(previousPoint.y(),point.y());
+//             QRectF rectf(x,y,width,height);
 
              QRectF nativeRect;
              nativeRect.setBottomLeft(previousPoint);
              nativeRect.setTopRight(point);
 
-             positiveRect = rectf;
+//             positiveRect = rectf;
 
              tempRect = scene.addRect(nativeRect,QPen(QBrush(Qt::red),5,Qt::SolidLine,Qt::RoundCap));
              this->update();
@@ -196,8 +196,6 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
 
     QRect normRect(tl.x(),tl.y(),width,height);
 
-
-
     QImage piece = image.copy(normRect);
     setImage(piece);
 
@@ -207,7 +205,8 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
 
 void ImageView::resizeEvent(QResizeEvent *event)
 {
-    fitInView(sceneRect());
+    QRectF rectf = sceneRect();
+    fitInView(rectf,Qt::KeepAspectRatio);
     QGraphicsView::resizeEvent(event);
 }
 
