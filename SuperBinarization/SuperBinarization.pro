@@ -28,10 +28,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     Controllers/mainwindow.cpp \
-    main.cpp
+    main.cpp \
+    Models/inputmodel.cpp \
+    Views/imageview.cpp \
+    Views/defaultcontrols.cpp \
+    Abstract/singletoneclass.cpp \
+    Models/appstorage.cpp
 
 HEADERS += \
-    Controllers/mainwindow.h
+    Controllers/mainwindow.h \
+    Common/magic.h \
+    Common/consts.h \
+    Models/inputmodel.h \
+    Views/imageview.h \
+    Views/defaultcontrols.h \
+    Abstract/singletoneclass.h \
+    Models/appstorage.h
 
 FORMS += \
     Forms/mainwindow.ui
