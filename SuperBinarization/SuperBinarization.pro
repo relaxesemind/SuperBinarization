@@ -33,7 +33,9 @@ SOURCES += \
     Views/imageview.cpp \
     Views/defaultcontrols.cpp \
     Abstract/singletoneclass.cpp \
-    Models/appstorage.cpp
+    Models/appstorage.cpp \
+    Models/imagemodel.cpp \
+    Models/classmodel.cpp
 
 HEADERS += \
     Controllers/mainwindow.h \
@@ -43,7 +45,10 @@ HEADERS += \
     Views/imageview.h \
     Views/defaultcontrols.h \
     Abstract/singletoneclass.h \
-    Models/appstorage.h
+    Models/appstorage.h \
+    Models/imagemodel.h \
+    Models/classmodel.h \
+    Views/drawtool.h
 
 FORMS += \
     Forms/mainwindow.ui
