@@ -22,6 +22,8 @@ private slots:
 
     void on_curveRadioButton_clicked(bool checked);
 
+    void on_classListWidget_doubleClicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
 

@@ -35,7 +35,12 @@ SOURCES += \
     Abstract/singletoneclass.cpp \
     Models/appstorage.cpp \
     Models/imagemodel.cpp \
-    Models/classmodel.cpp
+    Models/classmodel.cpp \
+    Managers/colorgenerator.cpp \
+    Managers/managerslocator.cpp \
+    Models/baseareamodel.cpp \
+    Models/rectareamodel.cpp \
+    Models/polyareamodel.cpp
 
 HEADERS += \
     Controllers/mainwindow.h \
@@ -48,7 +53,12 @@ HEADERS += \
     Models/appstorage.h \
     Models/imagemodel.h \
     Models/classmodel.h \
-    Views/drawtool.h
+    Views/drawtool.h \
+    Managers/colorgenerator.h \
+    Managers/managerslocator.h \
+    Models/baseareamodel.h \
+    Models/rectareamodel.h \
+    Models/polyareamodel.h
 
 FORMS += \
     Forms/mainwindow.ui
