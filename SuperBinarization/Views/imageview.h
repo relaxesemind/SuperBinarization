@@ -2,7 +2,7 @@
 #define IMAGEVIEW_H
 
 #include "Views/drawtool.h"
-
+#include "Models/classmodel.h"
 
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
@@ -11,15 +11,13 @@
 #include <QMouseEvent>
 #include <QPoint>
 #include <QLineF>
-
+#include <memory>
 
 class ImageView : public QGraphicsView
 {
     Q_OBJECT
 
     using pGraphicsItem = std::shared_ptr<QGraphicsPixmapItem>;
-    using pLineItem     = std::shared_ptr<QGraphicsLineItem>;
-    using pRectItem     = std::shared_ptr<QGraphicsRectItem>;
 
 public:
     explicit ImageView(QWidget* widget = nullptr);
@@ -38,6 +36,7 @@ protected:
 
 public slots:
     void clearView();
+    void showClassAreas(const ClassModel& model);
 
 signals:
 
@@ -63,7 +62,7 @@ private: //property
 private: //methods
     QPointF transformCoordinates(QPointF pos) const;
     QPen currentPen();
-    void fitImageInView();
+    QPolygonF polygonFromLine(QList<QGraphicsLineItem *> line);
     QImage createSubImage(const QImage& image, const QRect & rect);
     QImage createSubImage(const QImage& image, const QPainterPath & path);
 };

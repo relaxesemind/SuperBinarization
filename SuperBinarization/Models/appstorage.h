@@ -7,6 +7,7 @@
 #include "Views/drawtool.h"
 
 #include <QVector>
+#include <QMap>
 
 class AppStorage : public SingletonClass<AppStorage>
 {

@@ -13,6 +13,7 @@ ImageView::ImageView(QWidget *widget) : QGraphicsView(widget)
     currentScale = 1.0;
     drawFlag = false;
     tempRect = nullptr;
+    tempLine = nullptr;
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setStyleSheet(QString(
@@ -38,20 +39,23 @@ void ImageView::setImage(const QImage &value)
     fitInView(item.get(),Qt::KeepAspectRatio);
 
     this->update();
-//    scale(this->rect().width()/scene.sceneRect().width(),this->rect().width()/scene.sceneRect().width());
-//    QSize imageSize = image.size();
-//    while (imageSize.height() > 800 or imageSize.width() > 800)
-//    {
-//         imageSize /= Global::zoomMul;
-
-//    }
-//    this->setFixedSize(imageSize);
 }
 
 void ImageView::clearView()
 {
     setImage(QImage());
     scene->clear();
+}
+
+void ImageView::showClassAreas(const ClassModel &model)
+{
+    auto& areas = model.areas;
+    QColor color = model.color;
+
+    for (pBaseAreaModel pArea : areas)
+    {
+         pArea->points();
+    }
 }
 
 bool ImageView::isReadyToDraw()
@@ -70,34 +74,21 @@ QPen ImageView::currentPen()
     return QPen(QBrush(Qt::green),2,Qt::SolidLine,Qt::RoundCap);
 }
 
-void ImageView::fitImageInView()
+QPolygonF ImageView::polygonFromLine(QList<QGraphicsLineItem *> completeLine)
 {
-        //adapt scene's bounding rect to image
-        scene->setSceneRect(QRectF(0, 0, item->pixmap().width(), item->pixmap().height()));
-
-        //fit scene into graphicsview - workaround from
-        //http://www.qtforum.org/article/35467/the-2px-border-problem-in-qgraphicsview.html
-        QTransform matrix(1,0,0,0,1,0,0,0,1);
-        qreal xscale = this->width() / this->sceneRect().width();
-        qreal yscale = this->height() / this->sceneRect().height();
-        xscale = yscale = qMin(xscale,yscale);
-        matrix.scale(xscale,yscale);
-        this->setTransform(matrix);
-
-        //compute current scaleFactor and corresponding wheel position
-        double width = (double)scene->width() / (double)this->width();
-        double height = (double)scene->height() / (double)this->height();
-        currentScale = (height > width) ? (1.0 / height) : (1.0 / width);
-//        wheelPosition = calcWheelPosition(scaleFactor);
-
-
-        //        choosePixmapTransform();
+    QVector<QPointF> points;
+    for_magic(line, completeLine)
+    {
+        QLineF qline = (*line)->line();
+        QPointF startPoint = qline.p1();
+        points << startPoint;
+    }
+    return QPolygonF(points);
 }
 
 QImage ImageView::createSubImage(const QImage &image, const QRect &rect)
 {
-    size_t offset = rect.x() * image.depth() / 8 + rect.y() * image.bytesPerLine();
-    return QImage(image.bits() + offset, rect.width(), rect.height(), image.bytesPerLine(), image.format());
+    return image.copy(rect);
 }
 
 QImage ImageView::createSubImage(const QImage &input, const QPainterPath &path)
@@ -232,8 +223,8 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
 
         QRect normRect(tl.x(),tl.y(),width,height);
 
-        QImage piece = image.copy(normRect);
-    //    setImage(piece);
+        QImage piece = createSubImage(image,normRect);
+        setImage(piece);
     }
 
     if (tool == DrawTool::Curve)
@@ -241,10 +232,11 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
         QPointF point = transformCoordinates(event->pos());
         completeLine << scene->addLine({point,startPoint},currentPen());
 
-//        for_magic(it,completeLine)
-//        {
-//            scene.removeItem(*it);
-//        }
+        QPainterPath path;
+        QPolygonF poly = polygonFromLine(completeLine);
+        path.addPolygon(poly);
+        QImage piece = createSubImage(image,path);
+        setImage(piece);
     }
 }
 
