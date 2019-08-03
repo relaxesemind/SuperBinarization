@@ -15,6 +15,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->menuBar->setNativeMenuBar(false);
 
+    componentsScenes = {new QGraphicsScene(this), new QGraphicsScene(this), new QGraphicsScene(this)};
+    ui->componentGraphicsView0->setScene(componentsScenes[0]);
+    ui->componentGraphicsView1->setScene(componentsScenes[1]);
+    ui->componentGraphicsView2->setScene(componentsScenes[2]);
+    drawComponentsAxis();
+
     QPixmap image;
 //    image.load("/Users/ivanovegor/Desktop/Снимок экрана 2019-04-07 в 12.40.07.png");
     image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
@@ -61,6 +67,16 @@ void MainWindow::updateClassListWidget()
         item->setBackgroundColor(color);
         item->setTextColor(Qt::white);
         list->addItem(item);
+    }
+}
+
+void MainWindow::drawComponentsAxis()
+{
+    const int offset = 5;
+    for (int i = 0; i < 3; ++i)
+    {
+        componentsScenes[i]->addLine(offset,offset,255 + offset, offset,QPen(Qt::black));
+        componentsScenes[i]->addLine(offset,offset,offset,-255 + offset,QPen(Qt::black));
     }
 }
 

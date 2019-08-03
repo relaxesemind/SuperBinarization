@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>978</width>
-    <height>594</height>
+    <width>1027</width>
+    <height>725</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -25,7 +25,7 @@
      <widget class="QTabWidget" name="tabWidget">
       <property name="minimumSize">
        <size>
-        <width>300</width>
+        <width>325</width>
         <height>0</height>
        </size>
       </property>
@@ -36,7 +36,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -92,6 +92,148 @@
        <attribute name="title">
         <string>Графики</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QScrollArea" name="scrollArea">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>300</width>
+             <height>953</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="spacing">
+             <number>10</number>
+            </property>
+            <property name="leftMargin">
+             <number>12</number>
+            </property>
+            <item>
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>Параметры</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QRadioButton" name="radioButton_2">
+                 <property name="text">
+                  <string>RGB</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radioButton">
+                 <property name="text">
+                  <string>HSV</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radioButton_3">
+                 <property name="text">
+                  <string>LAB</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGraphicsView" name="componentGraphicsView0">
+              <property name="minimumSize">
+               <size>
+                <width>265</width>
+                <height>265</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>265</width>
+                <height>265</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGraphicsView" name="componentGraphicsView1">
+              <property name="minimumSize">
+               <size>
+                <width>265</width>
+                <height>265</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>265</width>
+                <height>265</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGraphicsView" name="componentGraphicsView2">
+              <property name="minimumSize">
+               <size>
+                <width>265</width>
+                <height>265</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>265</width>
+                <height>265</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -162,7 +304,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>978</width>
+     <width>1027</width>
      <height>21</height>
     </rect>
    </property>

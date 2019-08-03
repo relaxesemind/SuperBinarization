@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QGraphicsView>
+#include <array>
 
 namespace Ui {
 class MainWindow;
@@ -28,9 +30,11 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    std::array<QGraphicsScene *, 3> componentsScenes;
 
 private:
     void updateClassListWidget();
+    void drawComponentsAxis();
 };
 
 #endif // MAINWINDOW_H
