@@ -5,6 +5,7 @@
 #include <QPolygonF>
 #include <QList>
 #include <QLineF>
+#include <QGraphicsLineItem>
 
 struct PolyAreaModel : public BaseAreaModel
 {
@@ -13,7 +14,9 @@ struct PolyAreaModel : public BaseAreaModel
 
     QVector<QPointF> points()override;
     QPolygonF polygon;
-    QList<QLineF> lineList;
+    QList<QLineF> nativeLine;
 };
+
+using pPolyAreaModel = std::shared_ptr<PolyAreaModel>;
 
 #endif // POLYAREAMODEL_H

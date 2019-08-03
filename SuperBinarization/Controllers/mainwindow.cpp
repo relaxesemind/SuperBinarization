@@ -37,8 +37,11 @@ void MainWindow::on_addClassPushButton_clicked()
 
         ClassModel classModel;
         classModel.className = name;
+        auto& storage = AppStorage::shared();
         classModel.color = ManagersLocator::shared().colorGenerator.get();
-        AppStorage::shared().classModelsVector.append(classModel);
+        storage.classModelsVector.append(classModel);
+        storage.currentClassIndex = storage.classModelsVector.count() - 1;
+        ui->label->setText("Текущий класс: " + name);
         this->updateClassListWidget();
     });
 }
@@ -81,20 +84,15 @@ void MainWindow::on_classListWidget_doubleClicked(const QModelIndex &index)
     {
         model.color = newColor;
         updateClassListWidget();
+        ui->imageView->updateWithCurrentClass(model);
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void MainWindow::on_classListWidget_clicked(const QModelIndex &index)
+{
+    auto& storage = AppStorage::shared();
+    storage.currentClassIndex = index.row();
+    ClassModel& model = storage.classModelsVector[index.row()];
+    ui->imageView->updateWithCurrentClass(model);
+    ui->label->setText("Текущий класс: " + model.className);
+}

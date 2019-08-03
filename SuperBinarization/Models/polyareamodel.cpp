@@ -8,10 +8,10 @@ QVector<QPointF> PolyAreaModel::points()
         return polygon;
     }
 
-    if (!lineList.isEmpty())
+    if (!nativeLine.isEmpty())
     {
         QVector<QPointF> points;
-        for_magic(line, lineList)
+        for_magic(line, nativeLine)
         {
             QLineF qline = *line;
             QPointF startPoint = qline.p1();

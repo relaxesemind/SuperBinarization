@@ -3,6 +3,7 @@
 
 #include "baseareamodel.h"
 #include <QRectF>
+#include <QGraphicsRectItem>
 
 struct RectAreaModel : public BaseAreaModel
 {
@@ -12,5 +13,7 @@ struct RectAreaModel : public BaseAreaModel
     QVector<QPointF> points()override;
     QRectF rect;
 };
+
+using pRectAreaModel = std::shared_ptr<RectAreaModel>;
 
 #endif // RECTAREAMODEL_H

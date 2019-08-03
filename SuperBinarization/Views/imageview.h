@@ -11,6 +11,7 @@
 #include <QMouseEvent>
 #include <QPoint>
 #include <QLineF>
+#include <type_traits>
 #include <memory>
 
 class ImageView : public QGraphicsView
@@ -36,7 +37,7 @@ protected:
 
 public slots:
     void clearView();
-    void showClassAreas(const ClassModel& model);
+    void updateWithCurrentClass(const ClassModel& model);
 
 signals:
 
@@ -44,7 +45,7 @@ private: //property
 ///Main
     QGraphicsScene *scene;
     qreal currentScale;
-    pGraphicsItem item;
+    QGraphicsPixmapItem *item;
     QImage image;
 
 ///DrawingLogic
@@ -54,8 +55,8 @@ private: //property
 
     QGraphicsRectItem *tempRect;
     QGraphicsLineItem *tempLine;
-    QList<QGraphicsLineItem *> completeLine;
-    QRectF positiveRect;
+    QList<QGraphicsLineItem *> currentLine;
+    QRectF currentRect;
 
 
 

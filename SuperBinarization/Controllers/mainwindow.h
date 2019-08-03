@@ -24,6 +24,8 @@ private slots:
 
     void on_classListWidget_doubleClicked(const QModelIndex &index);
 
+    void on_classListWidget_clicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
 

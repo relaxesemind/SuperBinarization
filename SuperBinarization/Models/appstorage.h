@@ -16,6 +16,8 @@ class AppStorage : public SingletonClass<AppStorage>
 
 public:
     QVector<ClassModel> classModelsVector;
+    ClassModel &currentModel();
+    int currentClassIndex;
     DrawTool drawTool;
 };
 

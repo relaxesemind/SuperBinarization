@@ -13,7 +13,7 @@ using pBaseAreaModel = std::shared_ptr<BaseAreaModel>;
 class ClassModel
 {
 public:
-    ClassModel();
+    ClassModel() = default;
     QString className;
     QColor color;
     QVector<pBaseAreaModel> areas;

@@ -57,6 +57,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Текущий класс:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QListWidget" name="classListWidget">
           <property name="maximumSize">
            <size>

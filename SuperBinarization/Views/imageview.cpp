@@ -4,6 +4,8 @@
 #include "Models/appstorage.h"
 #include <QtMath>
 #include "Common/magic.h"
+#include "Models/polyareamodel.h"
+#include "Models/rectareamodel.h"
 
 ImageView::ImageView(QWidget *widget) : QGraphicsView(widget)
 {
@@ -31,30 +33,46 @@ void ImageView::setImage(const QImage &value)
     image = value;
 
     QPixmap pixmap = QPixmap::fromImage(value);
-    item = std::make_shared<QGraphicsPixmapItem>(pixmap);
-    scene->addItem(item.get());
 
-    centerOn(item.get());
+    item = new QGraphicsPixmapItem(pixmap);
+    scene->addItem(item);
+
+    centerOn(item);
     scene->setSceneRect(0,0,pixmap.width(),pixmap.height());
-    fitInView(item.get(),Qt::KeepAspectRatio);
+    fitInView(item,Qt::KeepAspectRatio);
 
     this->update();
 }
 
 void ImageView::clearView()
 {
-    setImage(QImage());
+//    setImage(QImage());
     scene->clear();
 }
 
-void ImageView::showClassAreas(const ClassModel &model)
+void ImageView::updateWithCurrentClass(const ClassModel &model)
 {
-    auto& areas = model.areas;
-    QColor color = model.color;
+    clearView();
+    setImage(image);
 
-    for (pBaseAreaModel pArea : areas)
+    for (pBaseAreaModel area : model.areas)
     {
-         pArea->points();
+         QPolygonF poly(area->points());
+
+        for_magic(it, poly)
+        {
+            auto next = std::next(it);
+            if (next == poly.end())
+            {
+                next = poly.begin();
+//                scene->addLine(QLineF(*it,*next),currentPen());
+//                cont;
+            }
+
+
+            scene->addLine(QLineF(*it,*next),currentPen());
+        }
+
     }
 }
 
@@ -65,13 +83,13 @@ bool ImageView::isReadyToDraw()
 
 QPointF ImageView::transformCoordinates(QPointF pos) const
 {
-    QPointF l = mapToScene(pos.x(),pos.y());
-    return l;
+    return mapToScene(pos.x(),pos.y());
 }
 
 QPen ImageView::currentPen()
 {
-    return QPen(QBrush(Qt::green),2,Qt::SolidLine,Qt::RoundCap);
+    auto& current = AppStorage::shared().currentModel();
+    return QPen(QBrush(current.color),3,Qt::SolidLine,Qt::RoundCap);
 }
 
 QPolygonF ImageView::polygonFromLine(QList<QGraphicsLineItem *> completeLine)
@@ -116,7 +134,7 @@ void ImageView::wheelEvent(QWheelEvent *event)
          return;
      }
 
-     centerOn(item.get());
+     centerOn(item);
      QPoint degrees = event->angleDelta() / 8;
      if (degrees.y() > 0)
      {
@@ -153,27 +171,20 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
              {
                  scene->removeItem(tempRect);
              }
-//             qreal width = std::abs(previousPoint.x() - point.x());
-//             qreal height = std::abs(previousPoint.y() - point.y());
-//             QPoint tl;
-//             qreal x = std::min(previousPoint.x(),point.x());
-//             qreal y = std::max(previousPoint.y(),point.y());
-//             QRectF rectf(x,y,width,height);
 
-             QRectF nativeRect;
-             nativeRect.setBottomLeft(previousPoint);
-             nativeRect.setTopRight(point);
+             QRectF rect;
+             rect.setBottomLeft(previousPoint);
+             rect.setTopRight(point);
+             currentRect = rect.normalized();
 
-//             positiveRect = rectf;
-
-             tempRect = scene->addRect(nativeRect,QPen(QBrush(Qt::red),3,Qt::SolidLine,Qt::RoundCap));
+             tempRect = scene->addRect(rect,currentPen());
              this->update();
         break;
         }
          case DrawTool::Curve:
         {
             QLineF line(previousPoint, point);
-            completeLine << scene->addLine(line,currentPen());
+            currentLine << scene->addLine(line,currentPen());
             previousPoint = point;
         break;
         }
@@ -187,12 +198,7 @@ void ImageView::mousePressEvent(QMouseEvent *event)
         return;
     }
 
-    for_magic(it,completeLine)
-    {
-        scene->removeItem(*it);
-    }
-    completeLine.clear();
-
+    currentLine.clear();
     drawFlag = true;
     previousPoint = transformCoordinates(event->pos());
     startPoint = previousPoint;
@@ -202,41 +208,43 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
 {
     drawFlag = false;
 
+    ClassModel& currentModel = AppStorage::shared().currentModel();
     DrawTool tool = AppStorage::shared().drawTool;
 
     if (tool == DrawTool::Rect)
     {
-        QRectF rect = tempRect->rect();
-
-        if (!image.rect().contains(rect.toRect()))
+        if (!image.rect().contains(currentRect.toRect()))
         {
             return;
         }
 
-        QRect rectt = rect.toRect();
+        scene->addRect(currentRect,currentPen());
+        QImage piece = createSubImage(image,currentRect.toRect());
 
-        qreal width = std::abs(rectt.bottomLeft().x() - rectt.bottomRight().x());
-        qreal height = std::abs(rectt.bottomLeft().y() - rectt.topLeft().y());
-        QPoint tl;
-        tl.rx() = std::min(rectt.topLeft().x(),rectt.topRight().x());
-        tl.ry() = std::max(rectt.topLeft().y(),rectt.topRight().y());
+        pointer_magic(RectAreaModel, rectModel);
+        rectModel->rect = currentRect;
+        rectModel->imageArea = piece;
+        currentModel.areas.append(rectModel);
 
-        QRect normRect(tl.x(),tl.y(),width,height);
-
-        QImage piece = createSubImage(image,normRect);
-        setImage(piece);
+//        setImage(piece);
     }
 
     if (tool == DrawTool::Curve)
     {
         QPointF point = transformCoordinates(event->pos());
-        completeLine << scene->addLine({point,startPoint},currentPen());
+        currentLine << scene->addLine({point,startPoint},currentPen());
 
         QPainterPath path;
-        QPolygonF poly = polygonFromLine(completeLine);
+        QPolygonF poly = polygonFromLine(currentLine);
         path.addPolygon(poly);
         QImage piece = createSubImage(image,path);
-        setImage(piece);
+
+        pointer_magic(PolyAreaModel, polyModel);
+        polyModel->polygon = poly;
+        polyModel->imageArea = piece;
+        currentModel.areas.append(polyModel);
+
+//        setImage(piece);
     }
 }
 
