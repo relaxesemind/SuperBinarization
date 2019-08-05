@@ -70,14 +70,191 @@ void MainWindow::updateClassListWidget()
     }
 }
 
+const int offset = 5;
+
 void MainWindow::drawComponentsAxis()
 {
-    const int offset = 5;
+
     for (int i = 0; i < 3; ++i)
     {
-        componentsScenes[i]->addLine(offset,offset,255 + offset, offset,QPen(Qt::black));
-        componentsScenes[i]->addLine(offset,offset,offset,-255 + offset,QPen(Qt::black));
+        QGraphicsLineItem *xAxis = componentsScenes[i]->addLine(offset,offset,255 + offset, offset,QPen(Qt::black));
+        xAxis->setZValue(100);
+        QGraphicsLineItem *yAxis =componentsScenes[i]->addLine(offset,offset,offset,-255 + offset,QPen(Qt::black));
+        yAxis->setZValue(100);
     }
+}
+
+void MainWindow::drawGraphs()
+{
+
+    componentsScenes[0]->clear();
+    componentsScenes[1]->clear();
+    componentsScenes[2]->clear();
+
+    drawComponentsAxis();
+
+    bool isRGB = ui->radioButton_2->isChecked();
+    bool isHSV = ui->radioButton->isChecked();
+    bool isLAB = ui->radioButton_3->isChecked();
+
+    if (isRGB)
+    {
+        drawRGB();
+    }
+    else if (isLAB)
+    {
+        drawLAB();
+    }
+    else
+    {
+        drawHSV();
+    }
+}
+
+QImage MainWindow::byTwoComponents(components comp1, components comp2)
+{
+    auto& allClasses = AppStorage::shared().classModelsVector;
+    QImage result(256, 256, QImage::Format_RGB32);
+    result.fill(Qt::white);
+
+    QVector<QImage> classImagesRG;
+
+    for_magic(class_iter,allClasses)
+    {
+        QImage temp(256, 256, QImage::Format_RGB32);
+        temp.fill(Qt::white);
+
+        for_magic(p_area,class_iter->areas)
+        {
+            BaseAreaModel *area = p_area->get();
+            QImage areaImage = area->imageArea;
+
+            if (!areaImage.isNull())
+            {
+                for (int y = 0; y < areaImage.height(); ++y)
+                    for (int x = 0; x < areaImage.width(); ++x)
+                    {
+                       QRgb pixel = areaImage.pixel(x,y);
+                       int v1, v2;
+
+                       QRgb q = pixel;
+                       int _H, _S, _V;
+                       int r = qRed(q); int g = qGreen(q); int b = qBlue(q);
+                       int max = std::max(std::max(r,g),b);
+                       int min = std::min(std::min(r,g),b);
+
+                       _V = max;
+
+                       if (max == min)
+                       {
+                           _H = 0;
+                       }else if (max == r and g >= b)
+                       {
+                           _H = 60*(g-b)/(max-min);
+                       }else if (max == r and g < b)
+                       {
+                           _H = 360 + 60*(g-b)/(max-min);
+                       }else if (max == g)
+                       {
+                           _H = 120 + 60*(g-b)/(max-min);
+                       }else if (max == b)
+                       {
+                           _H = 240 + 60*(g-b)/(max-min);
+                       }
+
+                       _S = max == 0 ? 0 : 1 - min / max;
+
+
+                       switch (comp1)
+                       {
+                       case components::R: v1 = qRed(pixel); break;
+                       case components::G: v1 = qGreen(pixel); break;
+                       case components::B: v1 = qBlue(pixel); break;
+                       case components::H: v1 = _H % 256; break;
+                       case components::S: v1 = _S; break;
+                       case components::V: v1 = _V; break;
+                       default:
+                           break;
+                       }
+
+                       switch (comp2)
+                       {
+                       case components::R: v2 = qRed(pixel); break;
+                       case components::G: v2 = qGreen(pixel); break;
+                       case components::B: v2 = qBlue(pixel); break;
+                       case components::H: v2 = _H % 256; break;
+                       case components::S: v2 = _S; break;
+                       case components::V: v2 = _V; break;
+                       default:
+                           break;
+                       }
+
+                       temp.setPixel(v1,v2,class_iter->color.rgb());
+                    }
+            }
+        }
+
+       classImagesRG.append(temp);
+    }
+
+    for_magic(image,classImagesRG)
+    {
+        for (int y = 0; y < image->height(); ++y)
+            for (int x = 0; x < image->width(); ++x)
+            {
+                result.setPixel(x,y,result.pixel(x,y) + image->pixel(x,y));
+            }
+    }
+
+    return result;
+}
+
+void MainWindow::drawRGB()
+{
+    QImage RG = byTwoComponents(components::R, components::G);
+    QImage GB = byTwoComponents(components::G, components::B);
+    QImage BR = byTwoComponents(components::B, components::R);
+
+    QGraphicsPixmapItem *item0 = componentsScenes[0]->addPixmap(QPixmap::fromImage(RG));
+    item0->setPos(offset,-256);
+
+    QGraphicsPixmapItem *item1 = componentsScenes[1]->addPixmap(QPixmap::fromImage(GB));
+    item1->setPos(offset,-256);
+
+    QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
+    item2->setPos(offset,-256);
+}
+
+void MainWindow::drawHSV()
+{
+    QImage RG = byTwoComponents(components::H, components::S);
+    QImage GB = byTwoComponents(components::S, components::V);
+    QImage BR = byTwoComponents(components::V, components::H);
+
+    QGraphicsPixmapItem *item0 = componentsScenes[0]->addPixmap(QPixmap::fromImage(RG));
+    item0->setPos(offset,-256);
+
+    QGraphicsPixmapItem *item1 = componentsScenes[1]->addPixmap(QPixmap::fromImage(GB));
+    item1->setPos(offset,-256);
+
+    QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
+    item2->setPos(offset,-256);
+}
+
+void MainWindow::drawLAB()
+{
+    QImage RG = byTwoComponents(components::L, components::A);
+    QImage GB = byTwoComponents(components::A, components::B);
+    QImage BR = byTwoComponents(components::L, components::B);
+
+    QGraphicsPixmapItem *item0 = componentsScenes[0]->addPixmap(QPixmap::fromImage(RG));
+    item0->setPos(offset,-256);
+
+    QGraphicsPixmapItem *item1 = componentsScenes[1]->addPixmap(QPixmap::fromImage(GB));
+    item1->setPos(offset,-256);
+
+    QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
+    item2->setPos(offset,-256);
 }
 
 void MainWindow::on_rectRadioButton_clicked(bool checked)
@@ -111,4 +288,20 @@ void MainWindow::on_classListWidget_clicked(const QModelIndex &index)
     ClassModel& model = storage.classModelsVector[index.row()];
     ui->imageView->updateWithCurrentClass(model);
     ui->label->setText("Текущий класс: " + model.className);
+    drawGraphs();
+}
+
+void MainWindow::on_radioButton_2_clicked(bool checked)
+{
+    drawGraphs();
+}
+
+void MainWindow::on_radioButton_clicked(bool checked)
+{
+    drawGraphs();
+}
+
+void MainWindow::on_radioButton_3_clicked(bool checked)
+{
+    drawGraphs();
 }

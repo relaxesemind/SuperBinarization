@@ -46,7 +46,6 @@ void ImageView::setImage(const QImage &value)
 
 void ImageView::clearView()
 {
-//    setImage(QImage());
     scene->clear();
 }
 
@@ -65,10 +64,9 @@ void ImageView::updateWithCurrentClass(const ClassModel &model)
             if (next == poly.end())
             {
                 next = poly.begin();
-//                scene->addLine(QLineF(*it,*next),currentPen());
-//                cont;
+                scene->addLine(QLineF(*it,*next),currentPen());
+                break;
             }
-
 
             scene->addLine(QLineF(*it,*next),currentPen());
         }
