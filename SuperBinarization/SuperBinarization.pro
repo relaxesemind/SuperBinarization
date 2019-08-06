@@ -40,7 +40,8 @@ SOURCES += \
     Managers/managerslocator.cpp \
     Models/baseareamodel.cpp \
     Models/rectareamodel.cpp \
-    Models/polyareamodel.cpp
+    Models/polyareamodel.cpp \
+    Managers/mathmanager.cpp
 
 HEADERS += \
     Controllers/mainwindow.h \
@@ -58,7 +59,8 @@ HEADERS += \
     Managers/managerslocator.h \
     Models/baseareamodel.h \
     Models/rectareamodel.h \
-    Models/polyareamodel.h
+    Models/polyareamodel.h \
+    Managers/mathmanager.h
 
 FORMS += \
     Forms/mainwindow.ui

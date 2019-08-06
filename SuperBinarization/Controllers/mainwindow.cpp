@@ -111,6 +111,7 @@ void MainWindow::drawGraphs()
     }
 }
 
+
 QImage MainWindow::byTwoComponents(components comp1, components comp2)
 {
     auto& allClasses = AppStorage::shared().classModelsVector;
@@ -138,41 +139,34 @@ QImage MainWindow::byTwoComponents(components comp1, components comp2)
                        int v1, v2;
 
                        QRgb q = pixel;
-                       int _H, _S, _V;
-                       int r = qRed(q); int g = qGreen(q); int b = qBlue(q);
-                       int max = std::max(std::max(r,g),b);
-                       int min = std::min(std::min(r,g),b);
+                       float _H, _S, _V;
+                       float L, A, B;
 
-                       _V = max;
+                       bool isHSV = comp1 == components::H or comp1 == components::S or comp1 == components::V;
+                       bool isLAB = comp1 == components::L or comp1 == components::A or comp1 == components::_b;
 
-                       if (max == min)
+                       if (isHSV)
                        {
-                           _H = 0;
-                       }else if (max == r and g >= b)
-                       {
-                           _H = 60*(g-b)/(max-min);
-                       }else if (max == r and g < b)
-                       {
-                           _H = 360 + 60*(g-b)/(max-min);
-                       }else if (max == g)
-                       {
-                           _H = 120 + 60*(g-b)/(max-min);
-                       }else if (max == b)
-                       {
-                           _H = 240 + 60*(g-b)/(max-min);
+                           ManagersLocator::shared().mathManager.rgb2hsv(q,_H,_S,_V);
                        }
 
-                       _S = max == 0 ? 0 : 1 - min / max;
+                       if (isLAB)
+                       {
 
+                           ManagersLocator::shared().mathManager.rgb2lab(qRed(pixel),qGreen(pixel),qBlue(pixel),L,A,B);
+                       }
 
                        switch (comp1)
                        {
                        case components::R: v1 = qRed(pixel); break;
                        case components::G: v1 = qGreen(pixel); break;
                        case components::B: v1 = qBlue(pixel); break;
-                       case components::H: v1 = _H % 256; break;
-                       case components::S: v1 = _S; break;
-                       case components::V: v1 = _V; break;
+                       case components::H: v1 = static_cast<int>((_H / 360.f) * 256.f); break;
+                       case components::S: v1 = static_cast<int>(_S * 256.f); break;
+                       case components::V: v1 = static_cast<int>(_V * 256.f); break;
+                       case components::L: v1 = static_cast<int>(std::abs(L)); break;
+                       case components::A: v1 = static_cast<int>(std::abs(A)); break;
+                       case components::_b: v1 = static_cast<int>(std::abs(B)); break;
                        default:
                            break;
                        }
@@ -182,9 +176,12 @@ QImage MainWindow::byTwoComponents(components comp1, components comp2)
                        case components::R: v2 = qRed(pixel); break;
                        case components::G: v2 = qGreen(pixel); break;
                        case components::B: v2 = qBlue(pixel); break;
-                       case components::H: v2 = _H % 256; break;
-                       case components::S: v2 = _S; break;
-                       case components::V: v2 = _V; break;
+                       case components::H: v2 = static_cast<int>((_H / 360.f) * 256.f); break;
+                       case components::S: v2 = static_cast<int>(_S * 256.f); break;
+                       case components::V: v2 = static_cast<int>(_V * 256.f); break;
+                       case components::L: v2 = static_cast<int>(std::abs(L)); break;
+                       case components::A: v2 = static_cast<int>(std::abs(A)); break;
+                       case components::_b: v2 = static_cast<int>(std::abs(B)); break;
                        default:
                            break;
                        }
@@ -293,15 +290,33 @@ void MainWindow::on_classListWidget_clicked(const QModelIndex &index)
 
 void MainWindow::on_radioButton_2_clicked(bool checked)
 {
+    ui->label_2->setText("R");
+    ui->label_3->setText("G");
+    ui->label_4->setText("G");
+    ui->label_5->setText("B");
+    ui->label_6->setText("B");
+    ui->label_7->setText("R");
     drawGraphs();
 }
 
 void MainWindow::on_radioButton_clicked(bool checked)
 {
+    ui->label_2->setText("H");
+    ui->label_3->setText("S");
+    ui->label_4->setText("S");
+    ui->label_5->setText("V");
+    ui->label_6->setText("V");
+    ui->label_7->setText("H");
     drawGraphs();
 }
 
 void MainWindow::on_radioButton_3_clicked(bool checked)
 {
+    ui->label_2->setText("L");
+    ui->label_3->setText("A");
+    ui->label_4->setText("A");
+    ui->label_5->setText("B");
+    ui->label_6->setText("L");
+    ui->label_7->setText("B");
     drawGraphs();
 }

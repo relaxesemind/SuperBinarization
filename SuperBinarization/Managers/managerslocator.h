@@ -3,6 +3,7 @@
 
 #include "Abstract/singletoneclass.h"
 #include "colorgenerator.h"
+#include "mathmanager.h"
 
 
 class ManagersLocator : public SingletonClass<ManagersLocator>
@@ -12,6 +13,7 @@ class ManagersLocator : public SingletonClass<ManagersLocator>
 public:
 
     ColorGenerator<> colorGenerator;
+    MathManager mathManager;
 };
 
 #endif // MANAGERSLOCATOR_H
