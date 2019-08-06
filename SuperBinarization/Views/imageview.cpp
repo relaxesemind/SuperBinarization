@@ -16,6 +16,7 @@ ImageView::ImageView(QWidget *widget) : QGraphicsView(widget)
     drawFlag = false;
     tempRect = nullptr;
     tempLine = nullptr;
+    item = nullptr;
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setStyleSheet(QString(
@@ -33,6 +34,12 @@ void ImageView::setImage(const QImage &value)
     image = value;
 
     QPixmap pixmap = QPixmap::fromImage(value);
+
+    if (item)
+    {
+        scene->removeItem(item);
+        item = nullptr;
+    }
 
     item = new QGraphicsPixmapItem(pixmap);
     scene->addItem(item);
@@ -144,7 +151,6 @@ void ImageView::wheelEvent(QWheelEvent *event)
          scale(1/Global::zoomMul,1/Global::zoomMul);
          currentScale /= Global::zoomMul;
      }
-//     emit imageDidZoomed(currentZoom);
 }
 
 void ImageView::mouseMoveEvent(QMouseEvent *event)
@@ -165,7 +171,7 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
     {
         case DrawTool::Rect:
         {
-             if (tempRect)
+             if (tempRect and tempRect->scene() == scene)
              {
                  scene->removeItem(tempRect);
              }

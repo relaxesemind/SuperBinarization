@@ -40,6 +40,8 @@ private slots:
 
     void on_radioButton_3_clicked(bool checked);
 
+    void on_action_triggered();
+
 private:
     Ui::MainWindow *ui;
     std::array<QGraphicsScene *, 3> componentsScenes;

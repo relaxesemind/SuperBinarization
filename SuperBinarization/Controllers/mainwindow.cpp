@@ -4,7 +4,7 @@
 #include "Models/appstorage.h"
 #include "Common/magic.h"
 #include "Managers/managerslocator.h"
-
+#include <QFileDialog>
 #include <QColorDialog>
 
 
@@ -21,10 +21,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->componentGraphicsView2->setScene(componentsScenes[2]);
     drawComponentsAxis();
 
-    QPixmap image;
+//    QPixmap image;
 //    image.load("/Users/ivanovegor/Desktop/Снимок экрана 2019-04-07 в 12.40.07.png");
-    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
-    ui->imageView->setImage(image.toImage());
+//    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
+//    ui->imageView->setImage(image.toImage());
 }
 
 MainWindow::~MainWindow()
@@ -161,9 +161,9 @@ QImage MainWindow::byTwoComponents(components comp1, components comp2)
                        case components::R: v1 = qRed(pixel); break;
                        case components::G: v1 = qGreen(pixel); break;
                        case components::B: v1 = qBlue(pixel); break;
-                       case components::H: v1 = static_cast<int>((_H / 360.f) * 256.f); break;
-                       case components::S: v1 = static_cast<int>(_S * 256.f); break;
-                       case components::V: v1 = static_cast<int>(_V * 256.f); break;
+                       case components::H: v1 = static_cast<int>((_H / 360.f) * 255.f); break;
+                       case components::S: v1 = static_cast<int>(_S * 255.f); break;
+                       case components::V: v1 = static_cast<int>(_V * 255.f); break;
                        case components::L: v1 = static_cast<int>(std::abs(L)); break;
                        case components::A: v1 = static_cast<int>(std::abs(A)); break;
                        case components::_b: v1 = static_cast<int>(std::abs(B)); break;
@@ -176,9 +176,9 @@ QImage MainWindow::byTwoComponents(components comp1, components comp2)
                        case components::R: v2 = qRed(pixel); break;
                        case components::G: v2 = qGreen(pixel); break;
                        case components::B: v2 = qBlue(pixel); break;
-                       case components::H: v2 = static_cast<int>((_H / 360.f) * 256.f); break;
-                       case components::S: v2 = static_cast<int>(_S * 256.f); break;
-                       case components::V: v2 = static_cast<int>(_V * 256.f); break;
+                       case components::H: v2 = static_cast<int>((_H / 360.f) * 255.f); break;
+                       case components::S: v2 = static_cast<int>(_S * 255.f); break;
+                       case components::V: v2 = static_cast<int>(_V * 255.f); break;
                        case components::L: v2 = static_cast<int>(std::abs(L)); break;
                        case components::A: v2 = static_cast<int>(std::abs(A)); break;
                        case components::_b: v2 = static_cast<int>(std::abs(B)); break;
@@ -320,3 +320,24 @@ void MainWindow::on_radioButton_3_clicked(bool checked)
     ui->label_7->setText("B");
     drawGraphs();
 }
+
+void MainWindow::on_action_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(nullptr, "Выберите изображение", "", "*.jpg *.jpeg *.bmp *.png");
+    if (!fileName.isEmpty())
+    {
+        QPixmap pixmap;
+        pixmap.load(fileName);
+        ui->imageView->setImage(pixmap.toImage());
+    }
+}
+
+
+
+
+
+
+
+
+
+
