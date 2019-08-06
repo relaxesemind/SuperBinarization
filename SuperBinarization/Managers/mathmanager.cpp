@@ -31,6 +31,7 @@ void MathManager::rgb2lab(float R, float G, float B, float &l_s, float &a_s, flo
 //     F10          96.174	100.000	81.712	99.001	100.000	83.134	Ultralume 50, Philips TL85
 //     F11          100.966	100.000	64.370	103.866	100.000	65.627	Ultralume 40, Philips TL84
 //     F12      	108.046	100.000	39.228	111.428	100.000	40.353	Ultralume 30, Philips TL83
+
      float Xr = 103.754;
      float Yr = 100.000;
      float Zr = 49.861;
@@ -44,17 +45,7 @@ void MathManager::rgb2lab(float R, float G, float B, float &l_s, float &a_s, flo
 
      auto f = [e,k](float comp)->float
      {
-         float a = std::pow(comp,1./3.);
-         float b = (k * comp + 16) / 116.f;
-//         return comp > e ? a : b;
-         if (comp > e)
-         {
-             return a;
-         }
-         else
-         {
-             return b;
-         }
+         return comp > e ? std::pow(comp,1./3.) : (k * comp + 16) / 116.f;
      };
 
      float fx = f(xr);
