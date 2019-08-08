@@ -41,7 +41,8 @@ SOURCES += \
     Models/baseareamodel.cpp \
     Models/rectareamodel.cpp \
     Models/polyareamodel.cpp \
-    Managers/mathmanager.cpp
+    Managers/mathmanager.cpp \
+    Models/point3d.cpp
 
 HEADERS += \
     Controllers/mainwindow.h \
@@ -60,7 +61,8 @@ HEADERS += \
     Models/baseareamodel.h \
     Models/rectareamodel.h \
     Models/polyareamodel.h \
-    Managers/mathmanager.h
+    Managers/mathmanager.h \
+    Models/point3d.h
 
 FORMS += \
     Forms/mainwindow.ui

@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QColorDialog>
 
+const float defaultWidht = 325.f;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,10 +22,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->componentGraphicsView2->setScene(componentsScenes[2]);
     drawComponentsAxis();
 
-//    QPixmap image;
-//    image.load("/Users/ivanovegor/Desktop/Снимок экрана 2019-04-07 в 12.40.07.png");
+    QPixmap image;
+    image.load("/Users/ivanovegor/Desktop/Снимок экрана 2019-04-07 в 12.40.07.png");
 //    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
-//    ui->imageView->setImage(image.toImage());
+    ui->imageView->setImage(image.toImage());
+
+    ui->tabWidget->setMinimumWidth(defaultWidht);
+    ui->tabWidget->setMaximumWidth(defaultWidht);
+
+
+    updateVisionVectorLabel(AppStorage::shared().currentVisionVector);
 }
 
 MainWindow::~MainWindow()
@@ -167,8 +174,6 @@ QImage MainWindow::byTwoComponents(components comp1, components comp2)
                        case components::L: v1 = static_cast<int>(std::abs(L)); break;
                        case components::A: v1 = static_cast<int>(std::abs(A)); break;
                        case components::_b: v1 = static_cast<int>(std::abs(B)); break;
-                       default:
-                           break;
                        }
 
                        switch (comp2)
@@ -182,8 +187,6 @@ QImage MainWindow::byTwoComponents(components comp1, components comp2)
                        case components::L: v2 = static_cast<int>(std::abs(L)); break;
                        case components::A: v2 = static_cast<int>(std::abs(A)); break;
                        case components::_b: v2 = static_cast<int>(std::abs(B)); break;
-                       default:
-                           break;
                        }
 
                        temp.setPixel(v1,v2,class_iter->color.rgb());
@@ -252,6 +255,24 @@ void MainWindow::drawLAB()
 
     QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
     item2->setPos(offset,-256);
+}
+
+void MainWindow::updateVisionVectorLabel(QVector3D vector)
+{
+    QString X = QString::number(static_cast<int>(vector.x()));
+    QString Y = QString::number(static_cast<int>(vector.y()));
+    QString Z = QString::number(static_cast<int>(vector.z()));
+    QString len = QString::number(static_cast<int>(vector.length()));
+
+    QString _X = QString::number(vector.x() / vector.length(),'f',4);
+    QString _Y = QString::number(vector.y() / vector.length(),'f',4);
+    QString _Z = QString::number(vector.z() / vector.length(),'f',4);
+
+    ui->label_8->setText("V = V(" + X + ", " + Y + ", " + Z + ")");
+    ui->lineEdit->setText(len);
+    ui->lineEdit_2->setText(_X);
+    ui->lineEdit_3->setText(_Y);
+    ui->lineEdit_4->setText(_Z);
 }
 
 void MainWindow::on_rectRadioButton_clicked(bool checked)
@@ -333,11 +354,52 @@ void MainWindow::on_action_triggered()
 }
 
 
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    if (index == 2)
+    {
+        ui->tabWidget->setMaximumWidth(defaultWidht + 150);
+        ui->tabWidget->setMinimumWidth(defaultWidht + 150);
+    }
+    else
+    {
+        ui->tabWidget->setMinimumWidth(defaultWidht);
+        ui->tabWidget->setMaximumWidth(defaultWidht);
+    }
+}
 
 
+void MainWindow::on_horizontalSlider_valueChanged(int degrees)//X
+{
+    auto& vector = AppStorage::shared().currentVisionVector;
+    vector = ManagersLocator::shared().mathManager.Xspin(vector, degrees);
+    updateVisionVectorLabel(vector);
+}
 
 
+void MainWindow::on_horizontalSlider_2_valueChanged(int degrees)//y
+{
+    auto& vector = AppStorage::shared().currentVisionVector;
+    vector = ManagersLocator::shared().mathManager.Yspin(vector, degrees);
+    updateVisionVectorLabel(vector);
+}
 
+void MainWindow::on_horizontalSlider_3_valueChanged(int degrees)//z
+{
+    auto& vector = AppStorage::shared().currentVisionVector;
+    vector = ManagersLocator::shared().mathManager.Zspin(vector, degrees);
+    updateVisionVectorLabel(vector);
+}
 
-
-
+void MainWindow::on_lineEdit_editingFinished()//len
+{
+    QString text = ui->lineEdit->text();
+    bool ok = false;
+    int value = text.toInt(&ok);
+    if (ok)
+    {
+        auto& vector = AppStorage::shared().currentVisionVector;
+        vector *= value / vector.length();
+        updateVisionVectorLabel(vector);
+    }
+}

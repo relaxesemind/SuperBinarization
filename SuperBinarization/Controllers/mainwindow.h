@@ -42,6 +42,16 @@ private slots:
 
     void on_action_triggered();
 
+    void on_tabWidget_currentChanged(int index);
+
+    void on_horizontalSlider_valueChanged(int value);
+
+    void on_horizontalSlider_2_valueChanged(int value);
+
+    void on_horizontalSlider_3_valueChanged(int value);
+
+    void on_lineEdit_editingFinished();
+
 private:
     Ui::MainWindow *ui;
     std::array<QGraphicsScene *, 3> componentsScenes;
@@ -54,6 +64,7 @@ private:
     void drawRGB();
     void drawHSV();
     void drawLAB();
+    void updateVisionVectorLabel(QVector3D vector);
 };
 
 #endif // MAINWINDOW_H

@@ -28,11 +28,11 @@ public:
     void setImage(const QImage &value);
 
 protected:
-        void wheelEvent(QWheelEvent *event)override;
-        void mouseMoveEvent(QMouseEvent *event)override;
-        void mousePressEvent(QMouseEvent *event)override;
-        void mouseReleaseEvent(QMouseEvent *event)override;
-        void resizeEvent(QResizeEvent *event)override;
+    void wheelEvent(QWheelEvent *event)override;
+    void mouseMoveEvent(QMouseEvent *event)override;
+    void mousePressEvent(QMouseEvent *event)override;
+    void mouseReleaseEvent(QMouseEvent *event)override;
+    void resizeEvent(QResizeEvent *event)override;
 
 
 public slots:

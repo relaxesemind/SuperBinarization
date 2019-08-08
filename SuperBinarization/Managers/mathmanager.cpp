@@ -57,11 +57,6 @@ void MathManager::rgb2lab(float R, float G, float B, float &l_s, float &a_s, flo
      b_s = 200 * (fy -fz);
 }
 
-void MathManager::lab2rgb(float l_s, float a_s, float b_s, float &R, float &G, float &B)
-{
-
-}
-
 void MathManager::rgb2hsv(QRgb q, float &h, float &s, float &v)
 {
     float r = qRed(q) / 255.f;
@@ -91,3 +86,74 @@ void MathManager::rgb2hsv(QRgb q, float &h, float &s, float &v)
 
     s = max == 0 ? 0 : 1 - min / max;
 }
+
+QVector3D MathManager::projectionOfPointIntoPlane(const QVector3D &point, const QVector3D &normalVector)
+{
+    QVector3D r0 = point;
+    QVector3D n1 = normalVector;
+    qreal A1 = n1.x(), B1 = n1.y(), C1 = n1.z();
+    qreal D1 = - (std::pow(A1,2) + std::pow(B1,2) + std::pow(C1,2));
+    qreal constant = (QVector3D::dotProduct(r0,n1) + D1) / QVector3D::dotProduct(n1,n1);
+    QVector3D r1 = r0 - constant * normalVector;
+
+    return r1;
+}
+
+QVector3D MathManager::Zspin(QVector3D vector, int degrees)
+{
+    float x = vector.x(), y = vector.y(), z = vector.z();
+    float cosA = std::cos(degrees * M_PI / 180.0);
+    float sinA = std::sin(degrees * M_PI / 180.0);
+    float x_n = cosA * x - sinA * y;
+    float y_n = sinA * x + cosA * y;
+    return QVector3D(x_n, y_n, z);
+}
+
+QVector3D MathManager::Xspin(QVector3D vector, int degrees)
+{
+    float x = vector.x(), y = vector.y(), z = vector.z();
+    float cosA = std::cos(degrees * M_PI / 180.0);
+    float sinA = std::sin(degrees * M_PI / 180.0);
+    float y_n = cosA * y - sinA * z;
+    float z_n = sinA * y + cosA * z;
+    return QVector3D(x, y_n, z_n);
+}
+
+QVector3D MathManager::Yspin(QVector3D vector, int degrees)
+{
+    float x = vector.x(), y = vector.y(), z = vector.z();
+    float cosA = std::cos(degrees * M_PI / 180.0);
+    float sinA = std::sin(degrees * M_PI / 180.0);
+    float x_n = cosA * x + sinA * z;
+    float z_n = -sinA * x + cosA * z;
+    return QVector3D(x_n, y, z_n);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

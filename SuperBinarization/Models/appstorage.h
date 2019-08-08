@@ -7,18 +7,20 @@
 #include "Views/drawtool.h"
 
 #include <QVector>
+#include <QVector3D>
 #include <QMap>
 
 class AppStorage : public SingletonClass<AppStorage>
 {
     friend class SingletonClass<AppStorage>;
-    AppStorage() = default;
+    AppStorage();
 
 public:
     QVector<ClassModel> classModelsVector;
     ClassModel &currentModel();
     int currentClassIndex;
     DrawTool drawTool;
+    QVector3D currentVisionVector;
 };
 
 #endif // APPSTORAGE_H

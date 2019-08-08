@@ -54,6 +54,10 @@ void ImageView::setImage(const QImage &value)
 void ImageView::clearView()
 {
     scene->clear();
+    item = nullptr;
+    tempRect = nullptr;
+    tempLine = nullptr;
+    currentLine.clear();
 }
 
 void ImageView::updateWithCurrentClass(const ClassModel &model)
@@ -174,6 +178,7 @@ void ImageView::mouseMoveEvent(QMouseEvent *event)
              if (tempRect and tempRect->scene() == scene)
              {
                  scene->removeItem(tempRect);
+                 tempRect = nullptr;
              }
 
              QRectF rect;
@@ -223,6 +228,13 @@ void ImageView::mouseReleaseEvent(QMouseEvent *event)
         }
 
         scene->addRect(currentRect,currentPen());
+
+        if (tempRect and tempRect->scene() == scene)
+        {
+            scene->removeItem(tempRect);
+            tempRect = nullptr;
+        }
+
         QImage piece = createSubImage(image,currentRect.toRect());
 
         pointer_magic(RectAreaModel, rectModel);
