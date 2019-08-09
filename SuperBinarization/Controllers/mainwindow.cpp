@@ -371,6 +371,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 
 void MainWindow::on_horizontalSlider_valueChanged(int degrees)//X
 {
+    qDebug () << degrees;
     auto& vector = AppStorage::shared().currentVisionVector;
     vector = ManagersLocator::shared().mathManager.Xspin(vector, degrees);
     updateVisionVectorLabel(vector);
@@ -379,6 +380,7 @@ void MainWindow::on_horizontalSlider_valueChanged(int degrees)//X
 
 void MainWindow::on_horizontalSlider_2_valueChanged(int degrees)//y
 {
+    qDebug () << degrees;
     auto& vector = AppStorage::shared().currentVisionVector;
     vector = ManagersLocator::shared().mathManager.Yspin(vector, degrees);
     updateVisionVectorLabel(vector);
@@ -386,6 +388,7 @@ void MainWindow::on_horizontalSlider_2_valueChanged(int degrees)//y
 
 void MainWindow::on_horizontalSlider_3_valueChanged(int degrees)//z
 {
+    qDebug () << degrees;
     auto& vector = AppStorage::shared().currentVisionVector;
     vector = ManagersLocator::shared().mathManager.Zspin(vector, degrees);
     updateVisionVectorLabel(vector);

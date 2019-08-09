@@ -87,7 +87,7 @@ void ImageView::updateWithCurrentClass(const ClassModel &model)
 
 bool ImageView::isReadyToDraw()
 {
-    return (!scene->items().isEmpty());
+    return (!scene->items().isEmpty() and !AppStorage::shared().classModelsVector.isEmpty());
 }
 
 QPointF ImageView::transformCoordinates(QPointF pos) const
@@ -216,6 +216,10 @@ void ImageView::mousePressEvent(QMouseEvent *event)
 void ImageView::mouseReleaseEvent(QMouseEvent *event)
 {
     drawFlag = false;
+    if (!isReadyToDraw())
+    {
+        return;
+    }
 
     ClassModel& currentModel = AppStorage::shared().currentModel();
     DrawTool tool = AppStorage::shared().drawTool;
