@@ -52,6 +52,8 @@ private slots:
 
     void on_lineEdit_editingFinished();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::array<QGraphicsScene *, 3> componentsScenes;

@@ -1,6 +1,7 @@
 #include "mathmanager.h"
 #include <cmath>
 #include <algorithm>
+#include "Models/appstorage.h"
 
 void MathManager::rgb2lab(float R, float G, float B, float &l_s, float &a_s, float &b_s)
 {
@@ -67,6 +68,8 @@ void MathManager::rgb2hsv(QRgb q, float &h, float &s, float &v)
 
     v = max;
 
+
+
     if (max == min)
     {
         h = 0;
@@ -97,6 +100,23 @@ QVector3D MathManager::projectionOfPointIntoPlane(const QVector3D &point, const 
     QVector3D r1 = r0 - constant * normalVector;
 
     return r1;
+}
+
+QPointF MathManager::projectionInLocalCoordinates(QVector3D point)
+{
+    QVector3D visionVector = AppStorage::shared().currentVisionVector;
+    QVector3D eZs = visionVector;
+    eZs.normalize();
+
+    QVector3D eXs(0, 1, - eZs.y() / eZs.z()); eXs.normalize();
+    QVector3D eYs(- eZs.y() * eZs.y() / eZs.z() - eZs.z(), eZs.x() * eZs.y() / eZs.z(), eZs.x()); eYs.normalize();
+
+    float X = QVector3D::dotProduct(point, eXs);
+    float Y = QVector3D::dotProduct(point, eYs);
+    float Z = QVector3D::dotProduct(point, eZs);
+
+    QPointF result(X,Y);
+    return result;
 }
 
 QVector3D MathManager::Zspin(QVector3D vector, int degrees)

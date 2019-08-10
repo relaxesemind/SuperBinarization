@@ -428,3 +428,11 @@ void MainWindow::on_lineEdit_editingFinished()//len
         updateVisionVectorLabel();
     }
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    QVector3D point(124,122, 444);
+    auto &V = AppStorage::shared().currentVisionVector;
+
+    ManagersLocator::shared().mathManager.projectionInLocalCoordinates(V);
+}
