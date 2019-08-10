@@ -21,6 +21,7 @@ public:
     int currentClassIndex;
     DrawTool drawTool;
     QVector3D currentVisionVector;
+    QVector3D currentAngles;
 };
 
 #endif // APPSTORAGE_H

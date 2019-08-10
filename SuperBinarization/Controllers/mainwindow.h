@@ -64,7 +64,7 @@ private:
     void drawRGB();
     void drawHSV();
     void drawLAB();
-    void updateVisionVectorLabel(QVector3D vector);
+    void updateVisionVectorLabel();
 };
 
 #endif // MAINWINDOW_H

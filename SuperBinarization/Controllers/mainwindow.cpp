@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tabWidget->setMaximumWidth(defaultWidht);
 
 
-    updateVisionVectorLabel(AppStorage::shared().currentVisionVector);
+    updateVisionVectorLabel();
 }
 
 MainWindow::~MainWindow()
@@ -257,8 +257,11 @@ void MainWindow::drawLAB()
     item2->setPos(offset,-256);
 }
 
-void MainWindow::updateVisionVectorLabel(QVector3D vector)
+void MainWindow::updateVisionVectorLabel()
 {
+    QVector3D vector = AppStorage::shared().currentVisionVector;
+    QVector3D degrees = AppStorage::shared().currentAngles;
+
     QString X = QString::number(static_cast<int>(vector.x()));
     QString Y = QString::number(static_cast<int>(vector.y()));
     QString Z = QString::number(static_cast<int>(vector.z()));
@@ -273,6 +276,10 @@ void MainWindow::updateVisionVectorLabel(QVector3D vector)
     ui->lineEdit_2->setText(_X);
     ui->lineEdit_3->setText(_Y);
     ui->lineEdit_4->setText(_Z);
+
+    ui->horizontalSlider->setValue((int)degrees.x());
+    ui->horizontalSlider_2->setValue((int)degrees.y());
+    ui->horizontalSlider_3->setValue((int)degrees.z());
 }
 
 void MainWindow::on_rectRadioButton_clicked(bool checked)
@@ -371,27 +378,42 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 
 void MainWindow::on_horizontalSlider_valueChanged(int degrees)//X
 {
-    qDebug () << degrees;
     auto& vector = AppStorage::shared().currentVisionVector;
-    vector = ManagersLocator::shared().mathManager.Xspin(vector, degrees);
-    updateVisionVectorLabel(vector);
+    int currentDegrees = (int)AppStorage::shared().currentAngles.x();
+    int delta = degrees - currentDegrees;
+
+    AppStorage::shared().currentAngles.setX(degrees);
+    vector = ManagersLocator::shared().mathManager.Xspin(vector, delta);
+    AppStorage::shared().currentVisionVector = vector;
+
+    updateVisionVectorLabel();
 }
 
 
 void MainWindow::on_horizontalSlider_2_valueChanged(int degrees)//y
 {
-    qDebug () << degrees;
     auto& vector = AppStorage::shared().currentVisionVector;
-    vector = ManagersLocator::shared().mathManager.Yspin(vector, degrees);
-    updateVisionVectorLabel(vector);
+    int currentDegrees = (int)AppStorage::shared().currentAngles.y();
+    int delta = degrees - currentDegrees;
+
+    AppStorage::shared().currentAngles.setY(degrees);
+    vector = ManagersLocator::shared().mathManager.Yspin(vector, delta);
+    AppStorage::shared().currentVisionVector = vector;
+
+    updateVisionVectorLabel();
 }
 
 void MainWindow::on_horizontalSlider_3_valueChanged(int degrees)//z
 {
-    qDebug () << degrees;
     auto& vector = AppStorage::shared().currentVisionVector;
-    vector = ManagersLocator::shared().mathManager.Zspin(vector, degrees);
-    updateVisionVectorLabel(vector);
+    int currentDegrees = (int)AppStorage::shared().currentAngles.z();
+    int delta = degrees - currentDegrees;
+
+    AppStorage::shared().currentAngles.setZ(degrees);
+    vector = ManagersLocator::shared().mathManager.Zspin(vector, delta);
+    AppStorage::shared().currentVisionVector = vector;
+
+    updateVisionVectorLabel();
 }
 
 void MainWindow::on_lineEdit_editingFinished()//len
@@ -403,6 +425,6 @@ void MainWindow::on_lineEdit_editingFinished()//len
     {
         auto& vector = AppStorage::shared().currentVisionVector;
         vector *= value / vector.length();
-        updateVisionVectorLabel(vector);
+        updateVisionVectorLabel();
     }
 }
