@@ -57,6 +57,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::array<QGraphicsScene *, 3> componentsScenes;
+    QGraphicsScene *projectionScene;
 
 private:
     void updateClassListWidget();

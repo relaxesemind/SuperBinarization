@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->componentGraphicsView0->setScene(componentsScenes[0]);
     ui->componentGraphicsView1->setScene(componentsScenes[1]);
     ui->componentGraphicsView2->setScene(componentsScenes[2]);
+    projectionScene = new QGraphicsScene(this);
+    ui->graphicsView->setScene(projectionScene);
     drawComponentsAxis();
 
     QPixmap image;
@@ -214,6 +216,21 @@ void MainWindow::drawRGB()
     QImage RG = byTwoComponents(components::R, components::G);
     QImage GB = byTwoComponents(components::G, components::B);
     QImage BR = byTwoComponents(components::B, components::R);
+
+    auto& storage = AppStorage::shared();
+    QVector<QVector3D> points = *storage.points3D.find(colorModel::RGB);
+    points.clear();
+
+    for (int y = 0; y < RG.height(); ++y)
+        for (int x = 0; x < RG.width(); ++x)
+        {
+            int XY = RG.pixel(x,y);
+            int YZ = GB.pixel(x,y);
+            int ZX = BR.pixel(x,y);
+
+            QVector3D point = ManagersLocator::shared().mathManager.point3D(XY,YZ,ZX);
+            points.append(point);
+        }
 
     QGraphicsPixmapItem *item0 = componentsScenes[0]->addPixmap(QPixmap::fromImage(RG));
     item0->setPos(offset,-256);
@@ -431,8 +448,36 @@ void MainWindow::on_lineEdit_editingFinished()//len
 
 void MainWindow::on_pushButton_clicked()
 {
-    QVector3D point(124,122, 444);
-    auto &V = AppStorage::shared().currentVisionVector;
+    colorModel color_model = colorModel::RGB;
+    auto& storage = AppStorage::shared();
+    auto& points = *storage.points3D.find(color_model);
+    QImage result(512, 512, QImage::Format_RGB32);
+    result.fill(Qt::white);
 
-    ManagersLocator::shared().mathManager.projectionInLocalCoordinates(V);
+    if (points.isEmpty())
+    {
+        return;
+    }
+
+    for (QVector3D point : points)
+    {
+       QVector3D projectPoint = ManagersLocator::shared().mathManager.projectionOfPointIntoPlane(point, storage.currentVisionVector);
+       QPoint local = ManagersLocator::shared().mathManager.projectionInLocalCoordinates(projectPoint).toPoint();
+       result.setPixel(local.x(),local.y(),Qt::black);
+    }
+
+    projectionScene->addPixmap(QPixmap::fromImage(result));
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

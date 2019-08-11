@@ -10,6 +10,13 @@
 #include <QVector3D>
 #include <QMap>
 
+
+enum colorModel
+{
+    RGB, HSV, LAB
+};
+
+
 class AppStorage : public SingletonClass<AppStorage>
 {
     friend class SingletonClass<AppStorage>;
@@ -22,6 +29,7 @@ public:
     DrawTool drawTool;
     QVector3D currentVisionVector;
     QVector3D currentAngles;
+    QMap<colorModel, QVector<QVector3D>> points3D;
 };
 
 #endif // APPSTORAGE_H

@@ -12,6 +12,10 @@ AppStorage::AppStorage()
     vector = math.Zspin(vector,currentAngles.z());
 
     currentVisionVector = vector;
+
+    points3D.insert(colorModel::RGB,{});
+    points3D.insert(colorModel::HSV,{});
+    points3D.insert(colorModel::LAB,{});
 }
 
 ClassModel& AppStorage::currentModel()
