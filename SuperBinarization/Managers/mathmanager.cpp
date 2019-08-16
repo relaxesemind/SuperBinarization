@@ -149,21 +149,25 @@ QVector3D MathManager::Yspin(QVector3D vector, int degrees)
     return QVector3D(x_n, y, z_n);
 }
 
-QVector3D MathManager::point3D(float XY, float YZ, float XZ)
+QVector3D MathManager::point3D(QRgb XY, QRgb YZ, QRgb XZ)
 {
-    float XY_2 = std::pow(XY, 2);
-    float YZ_2 = std::pow(YZ, 2);
-    float XZ_2 = std::pow(XZ, 2);
+//    float XY_2 = std::pow(XY, 2);
+//    float YZ_2 = std::pow(YZ, 2);
+//    float XZ_2 = std::pow(XZ, 2);
 
-    float Z2 = 0.5 * (YZ_2 + XZ_2 - XY_2);
-    float X2 = XZ_2 - Z2;
-    float Y2 = YZ_2 - Z2;
+//    float Z2 = 0.5 * (YZ_2 + XZ_2 - XY_2);
+//    float X2 = XZ_2 - Z2;
+//    float Y2 = YZ_2 - Z2;
 
-    float X = std::sqrt(X2);
-    float Y = std::sqrt(Y2);
-    float Z = std::sqrt(Z2);
+//    float X = std::sqrt(X2);
+//    float Y = std::sqrt(Y2);
+//    float Z = std::sqrt(Z2);
 
-    return QVector3D(X,Y,Z);
+    int r = qRed(XY);
+    int g = qGreen(XY);
+    int b = qBlue(XY);
+
+    return QVector3D(qRed(XY),qGreen(XY),qBlue(XY));
 }
 
 

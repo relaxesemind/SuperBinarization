@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     drawComponentsAxis();
 
     QPixmap image;
-    image.load("/Users/ivanovegor/Desktop/Снимок экрана 2019-04-07 в 12.40.07.png");
+    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
 //    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
     ui->imageView->setImage(image.toImage());
 
@@ -218,17 +218,14 @@ void MainWindow::drawRGB()
     QImage BR = byTwoComponents(components::B, components::R);
 
     auto& storage = AppStorage::shared();
-    QVector<QVector3D> points = *storage.points3D.find(colorModel::RGB);
+    auto& points = *storage.points3D.find(colorModel::RGB);
     points.clear();
 
     for (int y = 0; y < RG.height(); ++y)
         for (int x = 0; x < RG.width(); ++x)
         {
-            int XY = RG.pixel(x,y);
-            int YZ = GB.pixel(x,y);
-            int ZX = BR.pixel(x,y);
-
-            QVector3D point = ManagersLocator::shared().mathManager.point3D(XY,YZ,ZX);
+            QRgb XY = RG.pixel(x,y);
+            QVector3D point = ManagersLocator::shared().mathManager.point3D(XY,XY,XY);
             points.append(point);
         }
 
@@ -451,7 +448,7 @@ void MainWindow::on_pushButton_clicked()
     colorModel color_model = colorModel::RGB;
     auto& storage = AppStorage::shared();
     auto& points = *storage.points3D.find(color_model);
-    QImage result(512, 512, QImage::Format_RGB32);
+    QImage result(256, 256, QImage::Format_RGB32);
     result.fill(Qt::white);
 
     if (points.isEmpty())
@@ -459,13 +456,25 @@ void MainWindow::on_pushButton_clicked()
         return;
     }
 
+    int counter = 0;
+
     for (QVector3D point : points)
     {
-       QVector3D projectPoint = ManagersLocator::shared().mathManager.projectionOfPointIntoPlane(point, storage.currentVisionVector);
-       QPoint local = ManagersLocator::shared().mathManager.projectionInLocalCoordinates(projectPoint).toPoint();
-       result.setPixel(local.x(),local.y(),Qt::black);
-    }
+        if (point != QVector3D(255,255,254) || point != QVector3D(255,255,255))
+        {
+            ++counter;
+        }
 
+//       QVector3D projectPoint = ManagersLocator::shared().mathManager.projectionOfPointIntoPlane(point, storage.currentVisionVector);
+//       QPoint local = ManagersLocator::shared().mathManager.projectionInLocalCoordinates(projectPoint).toPoint();
+//       int x = std::abs(local.x()) % 255;
+//       int y = std::abs(local.y()) % 255;
+//       result.setPixel(x,y,Qt::black);
+       int x = std::abs(((int)point.x())% 255);
+        int y = std::abs(((int)point.y())% 255);
+        result.setPixel(x,y,Qt::black);
+    }
+    qDebug() << counter;
     projectionScene->addPixmap(QPixmap::fromImage(result));
 }
 

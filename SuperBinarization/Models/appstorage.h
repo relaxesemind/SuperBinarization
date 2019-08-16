@@ -9,6 +9,7 @@
 #include <QVector>
 #include <QVector3D>
 #include <QMap>
+#include <utility>
 
 
 enum colorModel
@@ -29,7 +30,9 @@ public:
     DrawTool drawTool;
     QVector3D currentVisionVector;
     QVector3D currentAngles;
-    QMap<colorModel, QVector<QVector3D>> points3D;
+    QMap < colorModel,
+           QVector<QVector3D>
+         > points3D;
 };
 
 #endif // APPSTORAGE_H

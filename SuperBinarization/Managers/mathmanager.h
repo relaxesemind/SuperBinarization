@@ -15,7 +15,7 @@ public:
     QVector3D Zspin(QVector3D vector, int degrees);
     QVector3D Xspin(QVector3D vector, int degrees);
     QVector3D Yspin(QVector3D vector, int degrees);
-    QVector3D point3D(float XY, float YZ, float XZ);
+    QVector3D point3D(QRgb XY, QRgb YZ, QRgb XZ);
 };
 
 #endif // MATHMANAGER_H
