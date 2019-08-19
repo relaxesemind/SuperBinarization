@@ -17,7 +17,7 @@ enum colorModel
     RGB, HSV, LAB
 };
 
-using vector6D = std::pair<QVector3D, QVector3D>;
+using vector6D = std::pair<QVector3D, QRgb>;
 
 
 class AppStorage : public SingletonClass<AppStorage>

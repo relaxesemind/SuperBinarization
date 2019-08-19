@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "Views/defaultcontrols.h"
-#include "Models/appstorage.h"
 #include "Common/magic.h"
 #include "Managers/managerslocator.h"
 #include <QFileDialog>
@@ -25,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     drawComponentsAxis();
 
     QPixmap image;
-//    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
-    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
+    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
+//    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
     ui->imageView->setImage(image.toImage());
 
     ui->tabWidget->setMinimumWidth(defaultWidht);
@@ -129,6 +128,71 @@ void MainWindow::drawGraphs()
     }
 }
 
+void MainWindow::byThreeComponents(colorModel model)
+{
+    if (currentProjections[0].isNull() or currentProjections[1].isNull() or currentProjections[2].isNull())
+    {
+        return;
+    }
+
+    auto& allClasses = AppStorage::shared().classModelsVector;
+    auto& points = *AppStorage::shared().points3D.find(model);
+    points.clear();
+
+    for_magic(class_iter,allClasses)
+    {
+        for_magic(p_area,class_iter->areas)
+        {
+            BaseAreaModel *area = p_area->get();
+            QImage areaImage = area->imageArea;
+            if (!areaImage.isNull())
+            {
+                for (int y = 0; y < areaImage.height(); ++y)
+                    for (int x = 0; x < areaImage.width(); ++x)
+                    {
+                        QRgb pixel = areaImage.pixel(x,y);
+                        if (wtf_white(pixel))
+                        {
+                            continue;
+                        }
+
+                        int r = qRed(pixel);
+                        int g = qGreen(pixel);
+                        int b = qBlue(pixel);
+
+                        float _H, _S, _V;
+                        float L, A, B;
+
+                        if (model == colorModel::RGB)
+                        {
+                            vector6D point;
+                            point.first = QVector3D(r,g,b);
+                            point.second = currentProjections[0].pixel(r,g);
+                            points.append(point);
+                        }
+                        else if (model == colorModel::HSV)
+                        {
+                             ManagersLocator::shared().mathManager.rgb2hsv(pixel,_H,_S,_V);
+
+                             int h = static_cast<int>((_H / 360.f) * 255.f);
+                             int s = static_cast<int>(_S * 255.f);
+                             int v = static_cast<int>(_V * 255.f);
+
+
+                        }
+                        else if (model == colorModel::LAB)
+                        {
+                             ManagersLocator::shared().mathManager.rgb2lab(r,g,b,L,A,B);
+                             int l = static_cast<int>(std::abs(L));
+                             int a = static_cast<int>(std::abs(A));
+                             int b = static_cast<int>(std::abs(B));
+                        }
+
+                    }
+            }
+        }
+    }
+}
 
 QImage MainWindow::byTwoComponents(components comp1, components comp2)
 {
@@ -225,6 +289,9 @@ void MainWindow::drawRGB()
     QImage RG = byTwoComponents(components::R, components::G);
     QImage GB = byTwoComponents(components::G, components::B);
     QImage BR = byTwoComponents(components::B, components::R);
+    currentProjections[0] = RG;
+    currentProjections[1] = GB;
+    currentProjections[2] = BR;
 
     auto& storage = AppStorage::shared();
     auto& points = *storage.points3D.find(colorModel::RGB);
@@ -459,8 +526,10 @@ void MainWindow::on_lineEdit_editingFinished()//len
 void MainWindow::on_pushButton_clicked()
 {
     colorModel color_model = colorModel::RGB;
+    byThreeComponents(color_model);
     auto& storage = AppStorage::shared();
     auto& points = *storage.points3D.find(color_model);
+
     QImage result(256, 256, QImage::Format_RGB32);
     result.fill(Qt::white);
 
@@ -469,16 +538,18 @@ void MainWindow::on_pushButton_clicked()
         return;
     }
 
-//    int counter = 0;
+    for_magic(point, points)
+    {
+        vector6D p = *point;
+        QRgb color = p.second;
+        QVector3D projectPoint = ManagersLocator::shared().mathManager.projectionOfPointIntoPlane(p.first, storage.currentVisionVector);
+        QPoint local = ManagersLocator::shared().mathManager.projectionInLocalCoordinates(projectPoint).toPoint();
+        int x = std::abs(local.x()) % 255;
+        int y = std::abs(local.y()) % 255;
+        result.setPixel(x,y,color);
+    }
 
-//    for (QVector3D point : points)
-//    {
-//        if (point != QVector3D(255,255,254) || point != QVector3D(255,255,255))
-//        {
-//            ++counter;
-//        }
 
-////       QVector3D projectPoint = ManagersLocator::shared().mathManager.projectionOfPointIntoPlane(point, storage.currentVisionVector);
 ////       QPoint local = ManagersLocator::shared().mathManager.projectionInLocalCoordinates(projectPoint).toPoint();
 ////       int x = std::abs(local.x()) % 255;
 ////       int y = std::abs(local.y()) % 255;
@@ -488,7 +559,7 @@ void MainWindow::on_pushButton_clicked()
 //        result.setPixel(x,y,Qt::black);
 //    }
 //    qDebug() << counter;
-//    projectionScene->addPixmap(QPixmap::fromImage(result));
+    projectionScene->addPixmap(QPixmap::fromImage(result));
 }
 
 

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsView>
 #include "Models/classmodel.h"
+#include "Models/appstorage.h"
 #include <array>
 
 enum components
@@ -58,6 +59,7 @@ private:
     Ui::MainWindow *ui;
     std::array<QGraphicsScene *, 3> componentsScenes;
     QGraphicsScene *projectionScene;
+    QImage currentProjections[3];
 
 private:
     void updateClassListWidget();
@@ -68,6 +70,7 @@ private:
     void drawHSV();
     void drawLAB();
     void updateVisionVectorLabel();
+    void byThreeComponents(colorModel model);
 };
 
 #endif // MAINWINDOW_H
