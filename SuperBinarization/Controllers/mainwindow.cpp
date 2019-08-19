@@ -178,7 +178,10 @@ void MainWindow::byThreeComponents(colorModel model)
                              int s = static_cast<int>(_S * 255.f);
                              int v = static_cast<int>(_V * 255.f);
 
-
+                             vector6D point;
+                             point.first = QVector3D(h,s,v);
+                             point.second = currentProjections[0].pixel(h,s);
+                             points.append(point);
                         }
                         else if (model == colorModel::LAB)
                         {
@@ -186,6 +189,11 @@ void MainWindow::byThreeComponents(colorModel model)
                              int l = static_cast<int>(std::abs(L));
                              int a = static_cast<int>(std::abs(A));
                              int b = static_cast<int>(std::abs(B));
+
+                             vector6D point;
+                             point.first = QVector3D(l,a,b);
+                             point.second = currentProjections[0].pixel(l,a);
+                             points.append(point);
                         }
 
                     }
@@ -325,6 +333,10 @@ void MainWindow::drawHSV()
     QImage GB = byTwoComponents(components::S, components::V);
     QImage BR = byTwoComponents(components::V, components::H);
 
+    currentProjections[0] = RG;
+    currentProjections[1] = GB;
+    currentProjections[2] = BR;
+
     QGraphicsPixmapItem *item0 = componentsScenes[0]->addPixmap(QPixmap::fromImage(RG));
     item0->setPos(offset,-256);
 
@@ -340,6 +352,10 @@ void MainWindow::drawLAB()
     QImage RG = byTwoComponents(components::L, components::A);
     QImage GB = byTwoComponents(components::A, components::B);
     QImage BR = byTwoComponents(components::L, components::B);
+
+    currentProjections[0] = RG;
+    currentProjections[1] = GB;
+    currentProjections[2] = BR;
 
     QGraphicsPixmapItem *item0 = componentsScenes[0]->addPixmap(QPixmap::fromImage(RG));
     item0->setPos(offset,-256);
@@ -549,16 +565,6 @@ void MainWindow::on_pushButton_clicked()
         result.setPixel(x,y,color);
     }
 
-
-////       QPoint local = ManagersLocator::shared().mathManager.projectionInLocalCoordinates(projectPoint).toPoint();
-////       int x = std::abs(local.x()) % 255;
-////       int y = std::abs(local.y()) % 255;
-////       result.setPixel(x,y,Qt::black);
-//       int x = std::abs(((int)point.x())% 255);
-//        int y = std::abs(((int)point.y())% 255);
-//        result.setPixel(x,y,Qt::black);
-//    }
-//    qDebug() << counter;
     projectionScene->addPixmap(QPixmap::fromImage(result));
 }
 
