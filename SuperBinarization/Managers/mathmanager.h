@@ -16,6 +16,7 @@ public:
     QVector3D Xspin(QVector3D vector, int degrees);
     QVector3D Yspin(QVector3D vector, int degrees);
     QVector3D point3D(QRgb XY, QRgb YZ, QRgb XZ);
+    bool beyondThePlane(const QVector3D& point);
 };
 
 #endif // MATHMANAGER_H

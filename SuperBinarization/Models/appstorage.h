@@ -18,7 +18,7 @@ enum colorModel
 };
 
 using vector6D = std::pair<QVector3D, QRgb>;
-
+using planeABCD = std::tuple<float,float,float,float>;
 
 class AppStorage : public SingletonClass<AppStorage>
 {
@@ -32,9 +32,8 @@ public:
     DrawTool drawTool;
     QVector3D currentVisionVector;
     QVector3D currentAngles;
-    QMap <colorModel,
-          QVector<vector6D>
-         > points3D;
+    planeABCD planeConsts;
+    QMap<colorModel, QVector<vector6D>> points3D;
 };
 
 #endif // APPSTORAGE_H

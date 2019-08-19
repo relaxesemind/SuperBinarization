@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     updateVisionVectorLabel();
+    updatePlaneLabel();
 }
 
 MainWindow::~MainWindow()
@@ -392,6 +393,30 @@ void MainWindow::updateVisionVectorLabel()
     ui->horizontalSlider_3->setValue((int)degrees.z());
 }
 
+void MainWindow::updatePlaneLabel()
+{
+    QLabel *planeLabel = ui->label_18;
+    planeABCD values = AppStorage::shared().planeConsts;
+    QString A = QString::number(std::get<0>(values));
+    QString B = QString::number(std::get<1>(values));
+    QString C = QString::number(std::get<2>(values));
+    QString D = QString::number(std::get<3>(values));
+
+    QString a = A;
+    QString b = B;
+    QString c = C;
+    QString d = D;
+
+    B = *B.begin() == "-" ? "X " + B : "X + " + B;
+    C = *C.begin() == "-" ? "Y " + C + "Z = " : "Y + " + C + "Z = ";
+
+    planeLabel->setText(A + B + C + D);
+    ui->lineEdit_5->setText(a);
+    ui->lineEdit_6->setText(b);
+    ui->lineEdit_7->setText(c);
+    ui->lineEdit_8->setText(d);
+}
+
 void MainWindow::on_rectRadioButton_clicked(bool checked)
 {
     AppStorage::shared().drawTool = DrawTool::Rect;
@@ -539,12 +564,26 @@ void MainWindow::on_lineEdit_editingFinished()//len
     }
 }
 
+QRgb highlightColor(QRgb color)
+{
+    QColor c(color);
+    const int high = 25;
+    c.setRed(c.red() + high);
+    c.setGreen(c.green() + high);
+    c.setBlue(c.blue() + high);
+
+    return c.rgb();
+}
+
 void MainWindow::on_pushButton_clicked()
 {
     colorModel color_model = colorModel::RGB;
     byThreeComponents(color_model);
     auto& storage = AppStorage::shared();
     auto& points = *storage.points3D.find(color_model);
+    auto& math = ManagersLocator::shared().mathManager;
+
+    QImage sourceImage = ui->imageView->getImage();
 
     QImage result(256, 256, QImage::Format_RGB32);
     result.fill(Qt::white);
@@ -558,25 +597,86 @@ void MainWindow::on_pushButton_clicked()
     {
         vector6D p = *point;
         QRgb color = p.second;
-        QVector3D projectPoint = ManagersLocator::shared().mathManager.projectionOfPointIntoPlane(p.first, storage.currentVisionVector);
-        QPoint local = ManagersLocator::shared().mathManager.projectionInLocalCoordinates(projectPoint).toPoint();
+        QVector3D projectPoint = math.projectionOfPointIntoPlane(p.first, storage.currentVisionVector);
+        bool beyond = math.beyondThePlane(projectPoint);
+        QPoint local = math.projectionInLocalCoordinates(projectPoint).toPoint();
+
+        if (beyond)
+        {
+            color = highlightColor(color);
+        }
+
         int x = std::abs(local.x()) % 255;
         int y = std::abs(local.y()) % 255;
+
         result.setPixel(x,y,color);
+
+//        for (int _y = 0; _y < sourceImage.height(); ++_y)
+//            for (int _x = 0; _x < sourceImage.width(); ++_x)
+//            {
+//                QRgb pixel = sourceImage.pixel(_x,_y);
+//                QVector3D vector(qRed(pixel),qGreen(pixel),qBlue(pixel));
+//                if (vector == p.first and beyond)
+//                {
+//                    sourceImage.setPixel(_x,_y,Qt::black);
+//                }
+//            }
     }
 
+//    ui->imageView->setImage(sourceImage);
     projectionScene->addPixmap(QPixmap::fromImage(result));
 }
 
+void MainWindow::on_lineEdit_5_editingFinished()
+{
+    auto& currentA = std::get<0>(AppStorage::shared().planeConsts);
+    QString text = ui->lineEdit_5->text();
+    bool ok;
+    int value = text.toInt(&ok);
+    if (ok)
+    {
+        currentA = value;
+    }
 
+    updatePlaneLabel();
+}
 
+void MainWindow::on_lineEdit_6_editingFinished()
+{
+    auto& currentA = std::get<1>(AppStorage::shared().planeConsts);
+    QString text = ui->lineEdit_6->text();
+    bool ok;
+    int value = text.toInt(&ok);
+    if (ok)
+    {
+        currentA = value;
+        updatePlaneLabel();
+    }
+}
 
+void MainWindow::on_lineEdit_8_editingFinished()
+{
+    auto& currentA = std::get<3>(AppStorage::shared().planeConsts);
+    QString text = ui->lineEdit_8->text();
+    bool ok;
+    int value = text.toInt(&ok);
+    if (ok)
+    {
+        currentA = value;
+        updatePlaneLabel();
+    }
 
+}
 
-
-
-
-
-
-
-
+void MainWindow::on_lineEdit_7_editingFinished()
+{
+    auto& currentA = std::get<2>(AppStorage::shared().planeConsts);
+    QString text = ui->lineEdit_7->text();
+    bool ok;
+    int value = text.toInt(&ok);
+    if (ok)
+    {
+        currentA = value;
+        updatePlaneLabel();
+    }
+}

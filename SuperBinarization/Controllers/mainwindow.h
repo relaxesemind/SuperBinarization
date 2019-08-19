@@ -55,6 +55,14 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_lineEdit_5_editingFinished();
+
+    void on_lineEdit_6_editingFinished();
+
+    void on_lineEdit_8_editingFinished();
+
+    void on_lineEdit_7_editingFinished();
+
 private:
     Ui::MainWindow *ui;
     std::array<QGraphicsScene *, 3> componentsScenes;
@@ -70,6 +78,7 @@ private:
     void drawHSV();
     void drawLAB();
     void updateVisionVectorLabel();
+    void updatePlaneLabel();
     void byThreeComponents(colorModel model);
 };
 

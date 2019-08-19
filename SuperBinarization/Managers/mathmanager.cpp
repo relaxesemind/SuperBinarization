@@ -170,6 +170,17 @@ QVector3D MathManager::point3D(QRgb XY, QRgb YZ, QRgb XZ)
     return QVector3D(qRed(XY),qGreen(XY),qBlue(XY));
 }
 
+bool MathManager::beyondThePlane(const QVector3D &point)
+{
+    auto& currentPlane = AppStorage::shared().planeConsts;
+    float A = std::get<0>(currentPlane);
+    float B = std::get<1>(currentPlane);
+    float C = std::get<2>(currentPlane);
+    float D = std::get<3>(currentPlane);
+
+    return A * point.x() + B * point.y() + C * point.z() - D > 0;
+}
+
 
 
 
