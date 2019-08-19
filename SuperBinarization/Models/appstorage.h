@@ -17,6 +17,8 @@ enum colorModel
     RGB, HSV, LAB
 };
 
+using vector6D = std::pair<QVector3D, QVector3D>;
+
 
 class AppStorage : public SingletonClass<AppStorage>
 {
@@ -30,8 +32,8 @@ public:
     DrawTool drawTool;
     QVector3D currentVisionVector;
     QVector3D currentAngles;
-    QMap < colorModel,
-           QVector<QVector3D>
+    QMap <colorModel,
+          QVector<vector6D>
          > points3D;
 };
 
