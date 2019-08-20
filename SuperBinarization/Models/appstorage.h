@@ -34,6 +34,7 @@ public:
     QVector3D currentAngles;
     planeABCD planeConsts;
     QMap<colorModel, QVector<vector6D>> points3D;
+    QVector<QRgb> beyondedRgb;
 };
 
 #endif // APPSTORAGE_H

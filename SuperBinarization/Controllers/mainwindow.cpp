@@ -23,10 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView->setScene(projectionScene);
     drawComponentsAxis();
 
-    QPixmap image;
-    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
+//    QPixmap image;
+//    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
 //    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
-    ui->imageView->setImage(image.toImage());
+//    ui->imageView->setImage(image.toImage());
 
     ui->tabWidget->setMinimumWidth(defaultWidht);
     ui->tabWidget->setMaximumWidth(defaultWidht);
@@ -568,11 +568,21 @@ QRgb highlightColor(QRgb color)
 {
     QColor c(color);
     const int high = 25;
-    c.setRed(c.red() + high);
-    c.setGreen(c.green() + high);
-    c.setBlue(c.blue() + high);
+    c.setRed(c.red() + high > 255 ? 255 : c.red() + high);
+    c.setGreen(c.green() + high > 255 ? 255 : c.green() + high);
+    c.setBlue(c.blue() + high > 255 ? 255 : c.blue() + high);
 
     return c.rgb();
+}
+
+QRgb rgbFromVector3D(const QVector3D& vector)
+{
+    QColor color;
+    color.setRed(vector.x());
+    color.setGreen(vector.y());
+    color.setBlue(vector.z());
+
+    return color.rgb();
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -582,6 +592,8 @@ void MainWindow::on_pushButton_clicked()
     auto& storage = AppStorage::shared();
     auto& points = *storage.points3D.find(color_model);
     auto& math = ManagersLocator::shared().mathManager;
+    auto& beyonded = storage.beyondedRgb;
+    beyonded.clear();
 
     QImage sourceImage = ui->imageView->getImage();
 
@@ -603,27 +615,27 @@ void MainWindow::on_pushButton_clicked()
 
         if (beyond)
         {
-            color = highlightColor(color);
+            color = QColor(Qt::black).rgb(); //highlightColor(color);
+            QRgb rgb = rgbFromVector3D(p.first);
+            beyonded.append(rgb);
         }
 
         int x = std::abs(local.x()) % 255;
         int y = std::abs(local.y()) % 255;
 
         result.setPixel(x,y,color);
-
-//        for (int _y = 0; _y < sourceImage.height(); ++_y)
-//            for (int _x = 0; _x < sourceImage.width(); ++_x)
-//            {
-//                QRgb pixel = sourceImage.pixel(_x,_y);
-//                QVector3D vector(qRed(pixel),qGreen(pixel),qBlue(pixel));
-//                if (vector == p.first and beyond)
-//                {
-//                    sourceImage.setPixel(_x,_y,Qt::black);
-//                }
-//            }
     }
 
-//    ui->imageView->setImage(sourceImage);
+//    for (int y = 0; y < sourceImage.height(); ++y)
+//        for (int x = 0; x < sourceImage.width(); ++x)
+//        {
+//            QRgb pixel = sourceImage.pixel(x,y);
+//            if (contains_magic(beyonded, pixel))
+//            {
+//                sourceImage.setPixel(x,y,Qt::black);
+//            }
+//        }
+
     projectionScene->addPixmap(QPixmap::fromImage(result));
 }
 
@@ -679,4 +691,9 @@ void MainWindow::on_lineEdit_7_editingFinished()
         currentA = value;
         updatePlaneLabel();
     }
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    ui->imageView->showAllClasses();
 }

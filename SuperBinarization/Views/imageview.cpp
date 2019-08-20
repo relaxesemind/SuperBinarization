@@ -85,6 +85,37 @@ void ImageView::updateWithCurrentClass(const ClassModel &model)
     }
 }
 
+void ImageView::showAllClasses()
+{
+    clearView();
+    setImage(image);
+
+    auto& models = AppStorage::shared().classModelsVector;
+
+    for (ClassModel &model : models)
+    {
+        for (pBaseAreaModel area : model.areas)
+        {
+             QPolygonF poly(area->points());
+
+            for_magic(it, poly)
+            {
+                auto next = std::next(it);
+                QPen pen = QPen(QBrush(model.color),3,Qt::SolidLine,Qt::RoundCap);
+                if (next == poly.end())
+                {
+                    next = poly.begin();
+                    scene->addLine(QLineF(*it,*next), pen);
+                    break;
+                }
+
+                scene->addLine(QLineF(*it,*next), pen);
+            }
+
+        }
+    }
+}
+
 bool ImageView::isReadyToDraw()
 {
     return (!scene->items().isEmpty() and !AppStorage::shared().classModelsVector.isEmpty());

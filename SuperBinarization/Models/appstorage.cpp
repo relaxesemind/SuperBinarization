@@ -17,7 +17,7 @@ AppStorage::AppStorage()
     points3D.insert(colorModel::HSV,{});
     points3D.insert(colorModel::LAB,{});
 
-    planeConsts = std::make_tuple(10, 10, -1, 1);
+    planeConsts = std::make_tuple(123, 1, -1, 1);
 }
 
 ClassModel& AppStorage::currentModel()

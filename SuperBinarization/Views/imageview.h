@@ -38,6 +38,7 @@ protected:
 public slots:
     void clearView();
     void updateWithCurrentClass(const ClassModel& model);
+    void showAllClasses();
 
 signals:
 
