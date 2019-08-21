@@ -3,6 +3,7 @@
 
 #include <QRgb>
 #include <QVector3D>
+#include "Models/appstorage.h"
 
 class MathManager
 {
@@ -17,6 +18,9 @@ public:
     QVector3D Yspin(QVector3D vector, int degrees);
     QVector3D point3D(QRgb XY, QRgb YZ, QRgb XZ);
     bool beyondThePlane(const QVector3D& point);
+    QVector3D findMiddlePoint(colorModel colorModel);
+    planeABCD defaultPlane(colorModel colorModel);
+    QVector3D defaultVisionVector(colorModel colorModel);
 };
 
 #endif // MATHMANAGER_H

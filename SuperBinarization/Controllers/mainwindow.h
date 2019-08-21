@@ -45,14 +45,6 @@ private slots:
 
     void on_tabWidget_currentChanged(int index);
 
-    void on_horizontalSlider_valueChanged(int value);
-
-    void on_horizontalSlider_2_valueChanged(int value);
-
-    void on_horizontalSlider_3_valueChanged(int value);
-
-    void on_lineEdit_editingFinished();
-
     void on_pushButton_clicked();
 
     void on_lineEdit_5_editingFinished();
@@ -64,6 +56,8 @@ private slots:
     void on_lineEdit_7_editingFinished();
 
     void on_pushButton_2_clicked();
+
+    void on_horizontalSlider_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;
@@ -79,8 +73,8 @@ private:
     void drawRGB();
     void drawHSV();
     void drawLAB();
-    void updateVisionVectorLabel();
     void updatePlaneLabel();
+    void updateVisionLabel();
     void byThreeComponents(colorModel model);
 };
 

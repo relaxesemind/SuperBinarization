@@ -1,7 +1,6 @@
 #include "mathmanager.h"
 #include <cmath>
 #include <algorithm>
-#include "Models/appstorage.h"
 
 void MathManager::rgb2lab(float R, float G, float B, float &l_s, float &a_s, float &b_s)
 {
@@ -179,6 +178,57 @@ bool MathManager::beyondThePlane(const QVector3D &point)
     float D = std::get<3>(currentPlane);
 
     return A * point.x() + B * point.y() + C * point.z() - D > 0;
+}
+
+QVector3D MathManager::findMiddlePoint(colorModel colorModel)
+{
+    auto& points = AppStorage::shared().points3D[colorModel];
+    if (points.isEmpty())
+    {
+        return QVector3D();
+    }
+
+    float mid_x = 0, mid_y = 0, mid_z = 0;
+    int count = points.count();
+    QVector3D result;
+
+    for (vector6D &point : points)
+    {
+        mid_x += point.first.x();
+        mid_y += point.first.y();
+        mid_z += point.first.z();
+    }
+
+    mid_x /= count;
+    mid_y /= count;
+    mid_z /= count;
+
+    return QVector3D(mid_x, mid_y, mid_z);
+}
+
+planeABCD MathManager::defaultPlane(colorModel colorModel)
+{
+    QVector3D M = findMiddlePoint(colorModel);
+    if (M == QVector3D())
+    {
+        return planeABCD();
+    }
+
+    auto& points = AppStorage::shared().points3D[colorModel];
+    int randomIndex = rand() % points.size();
+    QVector3D P = points[randomIndex].first;
+
+    float A = M.y()*P.z() - M.z()*P.y();
+    float B = M.z()*P.x() - M.x()*P.z();
+    float C = M.x()*P.y() - M.y()*P.x();
+
+    return std::make_tuple(A,B,C,0.f);
+}
+
+QVector3D MathManager::defaultVisionVector(colorModel colorModel)
+{
+    QVector3D M = findMiddlePoint(colorModel);
+    return M * 2;
 }
 
 

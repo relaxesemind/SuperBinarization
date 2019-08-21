@@ -23,16 +23,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView->setScene(projectionScene);
     drawComponentsAxis();
 
-//    QPixmap image;
-//    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
+    QPixmap image;
+    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
 //    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
-//    ui->imageView->setImage(image.toImage());
+    ui->imageView->setImage(image.toImage());
 
     ui->tabWidget->setMinimumWidth(defaultWidht);
     ui->tabWidget->setMaximumWidth(defaultWidht);
 
-
-    updateVisionVectorLabel();
     updatePlaneLabel();
 }
 
@@ -368,30 +366,6 @@ void MainWindow::drawLAB()
     item2->setPos(offset,-256);
 }
 
-void MainWindow::updateVisionVectorLabel()
-{
-    QVector3D vector = AppStorage::shared().currentVisionVector;
-    QVector3D degrees = AppStorage::shared().currentAngles;
-
-    QString X = QString::number(static_cast<int>(vector.x()));
-    QString Y = QString::number(static_cast<int>(vector.y()));
-    QString Z = QString::number(static_cast<int>(vector.z()));
-    QString len = QString::number(static_cast<int>(vector.length()));
-
-    QString _X = QString::number(vector.x() / vector.length(),'f',4);
-    QString _Y = QString::number(vector.y() / vector.length(),'f',4);
-    QString _Z = QString::number(vector.z() / vector.length(),'f',4);
-
-    ui->label_8->setText("V = V(" + X + ", " + Y + ", " + Z + ")");
-    ui->lineEdit->setText(len);
-    ui->lineEdit_2->setText(_X);
-    ui->lineEdit_3->setText(_Y);
-    ui->lineEdit_4->setText(_Z);
-
-    ui->horizontalSlider->setValue((int)degrees.x());
-    ui->horizontalSlider_2->setValue((int)degrees.y());
-    ui->horizontalSlider_3->setValue((int)degrees.z());
-}
 
 void MainWindow::updatePlaneLabel()
 {
@@ -415,6 +389,17 @@ void MainWindow::updatePlaneLabel()
     ui->lineEdit_6->setText(b);
     ui->lineEdit_7->setText(c);
     ui->lineEdit_8->setText(d);
+}
+
+void MainWindow::updateVisionLabel()
+{
+   QVector3D vector = AppStorage::shared().currentVisionVector;
+
+   QString X = QString::number(static_cast<int>(vector.x()));
+   QString Y = QString::number(static_cast<int>(vector.y()));
+   QString Z = QString::number(static_cast<int>(vector.z()));
+
+   ui->label_8->setText("V = V(" + X + ", " + Y + ", " + Z + ")");
 }
 
 void MainWindow::on_rectRadioButton_clicked(bool checked)
@@ -511,58 +496,18 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 }
 
 
-void MainWindow::on_horizontalSlider_valueChanged(int degrees)//X
-{
-    auto& vector = AppStorage::shared().currentVisionVector;
-    int currentDegrees = (int)AppStorage::shared().currentAngles.x();
-    int delta = degrees - currentDegrees;
+//void MainWindow::on_horizontalSlider_3_valueChanged(int degrees)//z
+//{
+//    auto& vector = AppStorage::shared().currentVisionVector;
+//    int currentDegrees = (int)AppStorage::shared().currentAngles.z();
+//    int delta = degrees - currentDegrees;
 
-    AppStorage::shared().currentAngles.setX(degrees);
-    vector = ManagersLocator::shared().mathManager.Xspin(vector, delta);
-    AppStorage::shared().currentVisionVector = vector;
+//    AppStorage::shared().currentAngles.setZ(degrees);
+//    vector = ManagersLocator::shared().mathManager.Zspin(vector, delta);
+//    AppStorage::shared().currentVisionVector = vector;
 
-    updateVisionVectorLabel();
-}
-
-
-void MainWindow::on_horizontalSlider_2_valueChanged(int degrees)//y
-{
-    auto& vector = AppStorage::shared().currentVisionVector;
-    int currentDegrees = (int)AppStorage::shared().currentAngles.y();
-    int delta = degrees - currentDegrees;
-
-    AppStorage::shared().currentAngles.setY(degrees);
-    vector = ManagersLocator::shared().mathManager.Yspin(vector, delta);
-    AppStorage::shared().currentVisionVector = vector;
-
-    updateVisionVectorLabel();
-}
-
-void MainWindow::on_horizontalSlider_3_valueChanged(int degrees)//z
-{
-    auto& vector = AppStorage::shared().currentVisionVector;
-    int currentDegrees = (int)AppStorage::shared().currentAngles.z();
-    int delta = degrees - currentDegrees;
-
-    AppStorage::shared().currentAngles.setZ(degrees);
-    vector = ManagersLocator::shared().mathManager.Zspin(vector, delta);
-    AppStorage::shared().currentVisionVector = vector;
-
-    updateVisionVectorLabel();
-}
-
-void MainWindow::on_lineEdit_editingFinished()//len
-{
-    QString text = ui->lineEdit->text();
-    bool ok = false;
-    int value = text.toInt(&ok);
-    if (ok)
-    {
-        auto& vector = AppStorage::shared().currentVisionVector;
-        vector *= value / vector.length();
-        updateVisionVectorLabel();
-    }
-}
+//    updateVisionVectorLabel();
+//}
 
 QRgb highlightColor(QRgb color)
 {
@@ -605,6 +550,11 @@ void MainWindow::on_pushButton_clicked()
         return;
     }
 
+    AppStorage::shared().planeConsts = math.defaultPlane(color_model);
+    AppStorage::shared().currentVisionVector = math.defaultVisionVector(color_model);
+    updatePlaneLabel();
+    updateVisionLabel();
+
     for_magic(point, points)
     {
         vector6D p = *point;
@@ -620,21 +570,11 @@ void MainWindow::on_pushButton_clicked()
             beyonded.append(rgb);
         }
 
-        int x = std::abs(local.x()) % 255;
-        int y = std::abs(local.y()) % 255;
+        int x = local.x() + 127; //std::abs(local.x()) % 255;
+        int y = local.y() + 127; //std::abs(local.y()) % 255;
 
         result.setPixel(x,y,color);
     }
-
-//    for (int y = 0; y < sourceImage.height(); ++y)
-//        for (int x = 0; x < sourceImage.width(); ++x)
-//        {
-//            QRgb pixel = sourceImage.pixel(x,y);
-//            if (contains_magic(beyonded, pixel))
-//            {
-//                sourceImage.setPixel(x,y,Qt::black);
-//            }
-//        }
 
     projectionScene->addPixmap(QPixmap::fromImage(result));
 }
@@ -696,4 +636,9 @@ void MainWindow::on_lineEdit_7_editingFinished()
 void MainWindow::on_pushButton_2_clicked()
 {
     ui->imageView->showAllClasses();
+}
+
+void MainWindow::on_horizontalSlider_valueChanged(int value)
+{
+
 }
