@@ -13,14 +13,14 @@ AppStorage::AppStorage()
 
     currentVisionVector = vector;
 
-    points3D.insert(colorModel::RGB,{});
-    points3D.insert(colorModel::HSV,{});
-    points3D.insert(colorModel::LAB,{});
+    points3D.insert(ColorModel::RGB,{});
+    points3D.insert(ColorModel::HSV,{});
+    points3D.insert(ColorModel::LAB,{});
 
     planeConsts = std::make_tuple(123, 1, -1, 1);
     currentAngleVector = 0;
     basisIsFilled = false;
-    colorModel = colorModel::RGB;
+    colorModel = ColorModel::RGB;
 }
 
 ClassModel& AppStorage::currentModel()

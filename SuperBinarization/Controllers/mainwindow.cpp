@@ -25,8 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
     drawComponentsAxis();
 
     QPixmap image;
-    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
-//    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
+//    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
+    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
     ui->imageView->setImage(image.toImage());
 
     ui->tabWidget->setMinimumWidth(defaultWidht);
@@ -128,7 +128,7 @@ void MainWindow::drawGraphs()
     }
 }
 
-void MainWindow::byThreeComponents(colorModel model)
+void MainWindow::byThreeComponents(ColorModel model)
 {
     if (currentProjections[0].isNull() or currentProjections[1].isNull() or currentProjections[2].isNull())
     {
@@ -163,14 +163,14 @@ void MainWindow::byThreeComponents(colorModel model)
                         float _H, _S, _V;
                         float L, A, B;
 
-                        if (model == colorModel::RGB)
+                        if (model == ColorModel::RGB)
                         {
                             vector6D point;
                             point.first = QVector3D(r,g,b);
                             point.second = class_iter->color.rgb(); //currentProjections[0].pixel(r,g);
                             points.append(point);
                         }
-                        else if (model == colorModel::HSV)
+                        else if (model == ColorModel::HSV)
                         {
                              ManagersLocator::shared().mathManager.rgb2hsv(pixel,_H,_S,_V);
 
@@ -183,7 +183,7 @@ void MainWindow::byThreeComponents(colorModel model)
                              point.second = currentProjections[0].pixel(h,s);
                              points.append(point);
                         }
-                        else if (model == colorModel::LAB)
+                        else if (model == ColorModel::LAB)
                         {
                              ManagersLocator::shared().mathManager.rgb2lab(r,g,b,L,A,B);
                              int l = static_cast<int>(std::abs(L));
@@ -302,7 +302,7 @@ void MainWindow::drawRGB()
     currentProjections[2] = BR;
 
     auto& storage = AppStorage::shared();
-    auto& points = *storage.points3D.find(colorModel::RGB);
+    auto& points = *storage.points3D.find(ColorModel::RGB);
     points.clear();
 
     for (int y = 0; y < RG.height(); ++y)
@@ -326,7 +326,7 @@ void MainWindow::drawRGB()
     QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
     item2->setPos(offset,-256);
 
-    storage.colorModel = colorModel::RGB;
+    storage.colorModel = ColorModel::RGB;
 }
 
 void MainWindow::drawHSV()
@@ -347,7 +347,7 @@ void MainWindow::drawHSV()
 
     QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
     item2->setPos(offset,-256);
-    AppStorage::shared().colorModel = colorModel::HSV;
+    AppStorage::shared().colorModel = ColorModel::HSV;
 }
 
 void MainWindow::drawLAB()
@@ -368,7 +368,7 @@ void MainWindow::drawLAB()
 
     QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
     item2->setPos(offset,-256);
-    AppStorage::shared().colorModel = colorModel::LAB;
+    AppStorage::shared().colorModel = ColorModel::LAB;
 }
 
 
@@ -543,7 +543,7 @@ void MainWindow::on_pushButton_clicked()
     auto& redLineBasis = storage.redLineBasis;
     beyonded.clear();
     redLineBasis.clear();
-    colorModel color_model = storage.colorModel;
+    ColorModel color_model = storage.colorModel;
     auto& points = *storage.points3D.find(color_model);
     byThreeComponents(color_model);
     QImage sourceImage = ui->imageView->getImage();

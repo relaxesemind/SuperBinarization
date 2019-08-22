@@ -12,7 +12,7 @@
 #include <utility>
 
 
-enum colorModel
+enum ColorModel
 {
     RGB, HSV, LAB
 };
@@ -34,10 +34,10 @@ public:
     QVector3D currentAngles;
     int currentAngleVector;
     planeABCD planeConsts;
-    QMap<colorModel, QVector<vector6D>> points3D;
+    QMap<ColorModel, QVector<vector6D>> points3D;
     QVector<QRgb> beyondedRgb;
     QVector<QPointF> redLineBasis;
-    colorModel colorModel;
+    ColorModel colorModel;
     bool basisIsFilled;
 };
 

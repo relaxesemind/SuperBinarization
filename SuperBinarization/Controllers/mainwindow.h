@@ -76,7 +76,7 @@ private:
     void drawLAB();
     void updatePlaneLabel();
     void updateVisionLabel();
-    void byThreeComponents(colorModel model);
+    void byThreeComponents(ColorModel model);
 };
 
 #endif // MAINWINDOW_H

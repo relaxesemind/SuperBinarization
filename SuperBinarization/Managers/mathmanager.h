@@ -26,9 +26,9 @@ public:
     QVector3D Yspin(QVector3D vector, int degrees);
     QVector3D point3D(QRgb XY, QRgb YZ, QRgb XZ);
     pointPosOverPlane beyondThePlane(const QVector3D& point);
-    QVector3D findMiddlePoint(colorModel colorModel);
-    planeABCD defaultPlane(colorModel colorModel);
-    QVector3D defaultVisionVector(colorModel colorModel);
+    QVector3D findMiddlePoint(ColorModel ColorModel);
+    planeABCD defaultPlane(ColorModel ColorModel);
+    QVector3D defaultVisionVector(ColorModel ColorModel);
     QVector3D rotateVisionVector(float angle);
 };
 

@@ -186,7 +186,7 @@ pointPosOverPlane MathManager::beyondThePlane(const QVector3D &point)
     return value > 0 ? pointPosOverPlane::front : pointPosOverPlane::behind;
 }
 
-QVector3D MathManager::findMiddlePoint(colorModel colorModel)
+QVector3D MathManager::findMiddlePoint(ColorModel colorModel)
 {
     auto& points = AppStorage::shared().points3D[colorModel];
     if (points.isEmpty())
@@ -212,7 +212,7 @@ QVector3D MathManager::findMiddlePoint(colorModel colorModel)
     return QVector3D(mid_x, mid_y, mid_z);
 }
 
-planeABCD MathManager::defaultPlane(colorModel colorModel)
+planeABCD MathManager::defaultPlane(ColorModel colorModel)
 {
     QVector3D M = findMiddlePoint(colorModel);
     if (M == QVector3D())
@@ -231,7 +231,7 @@ planeABCD MathManager::defaultPlane(colorModel colorModel)
     return std::make_tuple(A,B,C,0.f);
 }
 
-QVector3D MathManager::defaultVisionVector(colorModel colorModel)
+QVector3D MathManager::defaultVisionVector(ColorModel colorModel)
 {
     QVector3D M = findMiddlePoint(colorModel);
     return M * 3;
