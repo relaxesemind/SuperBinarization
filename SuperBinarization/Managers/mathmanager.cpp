@@ -177,7 +177,13 @@ bool MathManager::beyondThePlane(const QVector3D &point)
     float C = std::get<2>(currentPlane);
     float D = std::get<3>(currentPlane);
 
-    return A * point.x() + B * point.y() + C * point.z() - D > 0;
+    float value = A * point.x() + B * point.y() + C * point.z() - D;
+    if (std::abs(value) < 0.3)
+    {
+        AppStorage::shared().redLineBasis.append(point);
+    }
+
+    return value > 0;
 }
 
 QVector3D MathManager::findMiddlePoint(colorModel colorModel)
@@ -229,6 +235,27 @@ QVector3D MathManager::defaultVisionVector(colorModel colorModel)
 {
     QVector3D M = findMiddlePoint(colorModel);
     return M * 2;
+}
+
+QVector3D MathManager::rotateVisionVector(float angle)
+{
+    auto& storage = AppStorage::shared();
+    auto& visionVector = storage.currentVisionVector;
+    auto& plane = storage.planeConsts;
+    float A = std::get<0>(plane);
+    float B = std::get<1>(plane);
+    float C = std::get<2>(plane);
+
+    QVector3D normal(A,B,C);
+    normal.normalize();
+    QVector3D eX = visionVector.normalized();
+    QVector3D eY = QVector3D::crossProduct(normal, eX);
+    eY.normalize();
+    float L = visionVector.length();
+    float radians = angle * M_PI / 180.f;
+
+    QVector3D result = eX * L * std::cos(radians) + eY * L * std::sin(radians);
+    return result;
 }
 
 

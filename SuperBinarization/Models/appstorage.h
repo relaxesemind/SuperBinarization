@@ -32,9 +32,12 @@ public:
     DrawTool drawTool;
     QVector3D currentVisionVector;
     QVector3D currentAngles;
+    int currentAngleVector;
     planeABCD planeConsts;
     QMap<colorModel, QVector<vector6D>> points3D;
     QVector<QRgb> beyondedRgb;
+    QVector<QVector3D> redLineBasis;
+    bool basisIsFilled;
 };
 
 #endif // APPSTORAGE_H

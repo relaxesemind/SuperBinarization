@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     drawComponentsAxis();
 
     QPixmap image;
-    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
-//    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
+//    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
+    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
     ui->imageView->setImage(image.toImage());
 
     ui->tabWidget->setMinimumWidth(defaultWidht);
@@ -166,7 +166,7 @@ void MainWindow::byThreeComponents(colorModel model)
                         {
                             vector6D point;
                             point.first = QVector3D(r,g,b);
-                            point.second = currentProjections[0].pixel(r,g);
+                            point.second = class_iter->color.rgb(); //currentProjections[0].pixel(r,g);
                             points.append(point);
                         }
                         else if (model == colorModel::HSV)
@@ -371,10 +371,10 @@ void MainWindow::updatePlaneLabel()
 {
     QLabel *planeLabel = ui->label_18;
     planeABCD values = AppStorage::shared().planeConsts;
-    QString A = QString::number(std::get<0>(values));
-    QString B = QString::number(std::get<1>(values));
-    QString C = QString::number(std::get<2>(values));
-    QString D = QString::number(std::get<3>(values));
+    QString A = QString::number(static_cast<int>(std::get<0>(values)));
+    QString B = QString::number(static_cast<int>(std::get<1>(values)));
+    QString C = QString::number(static_cast<int>(std::get<2>(values)));
+    QString D = QString::number(static_cast<int>(std::get<3>(values)));
 
     QString a = A;
     QString b = B;
@@ -530,6 +530,8 @@ QRgb rgbFromVector3D(const QVector3D& vector)
     return color.rgb();
 }
 
+bool flag = true;
+
 void MainWindow::on_pushButton_clicked()
 {
     colorModel color_model = colorModel::RGB;
@@ -538,7 +540,9 @@ void MainWindow::on_pushButton_clicked()
     auto& points = *storage.points3D.find(color_model);
     auto& math = ManagersLocator::shared().mathManager;
     auto& beyonded = storage.beyondedRgb;
+    auto& redLineBasis = AppStorage::shared().redLineBasis;
     beyonded.clear();
+    redLineBasis.clear();
 
     QImage sourceImage = ui->imageView->getImage();
 
@@ -550,8 +554,14 @@ void MainWindow::on_pushButton_clicked()
         return;
     }
 
-    AppStorage::shared().planeConsts = math.defaultPlane(color_model);
-    AppStorage::shared().currentVisionVector = math.defaultVisionVector(color_model);
+
+    if (flag)
+    {
+        AppStorage::shared().planeConsts = math.defaultPlane(color_model);
+        AppStorage::shared().currentVisionVector = math.defaultVisionVector(color_model);
+        flag = false;
+    }
+
     updatePlaneLabel();
     updateVisionLabel();
 
@@ -570,8 +580,14 @@ void MainWindow::on_pushButton_clicked()
             beyonded.append(rgb);
         }
 
-        int x = local.x() + 127; //std::abs(local.x()) % 255;
-        int y = local.y() + 127; //std::abs(local.y()) % 255;
+        if (local.x() > result.width() - 1 or local.x() < 0 or
+                local.y() < 0 or local.y() > result.height() - 1)
+        {
+            continue;
+        }
+
+        int x = local.x();
+        int y = local.y();
 
         result.setPixel(x,y,color);
     }
@@ -640,5 +656,26 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_horizontalSlider_valueChanged(int value)
 {
-
+    auto& math = ManagersLocator::shared().mathManager;
+    auto& vector = AppStorage::shared().currentVisionVector;
+    int delta = value - AppStorage::shared().currentAngleVector;
+    AppStorage::shared().currentAngleVector += delta;
+    vector = math.rotateVisionVector(delta);
+    updateVisionLabel();
+    ui->label_10->setText(QString::number(value));
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

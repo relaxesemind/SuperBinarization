@@ -18,6 +18,8 @@ AppStorage::AppStorage()
     points3D.insert(colorModel::LAB,{});
 
     planeConsts = std::make_tuple(123, 1, -1, 1);
+    currentAngleVector = 0;
+    basisIsFilled = false;
 }
 
 ClassModel& AppStorage::currentModel()

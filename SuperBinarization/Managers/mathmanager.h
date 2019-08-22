@@ -3,6 +3,7 @@
 
 #include <QRgb>
 #include <QVector3D>
+#include <QVector2D>
 #include "Models/appstorage.h"
 
 class MathManager
@@ -21,6 +22,7 @@ public:
     QVector3D findMiddlePoint(colorModel colorModel);
     planeABCD defaultPlane(colorModel colorModel);
     QVector3D defaultVisionVector(colorModel colorModel);
+    QVector3D rotateVisionVector(float angle);
 };
 
 #endif // MATHMANAGER_H
