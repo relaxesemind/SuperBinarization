@@ -607,23 +607,25 @@ void MainWindow::on_pushButton_clicked()
     {
         QPointF p1 = storage.redLineBasis.first();
         QPointF p2 = storage.redLineBasis.last();
-        if (p1 != p2 and p2 != QPointF(0,0))
+        if (p1.x() != p2.x())
         {
-            while (p2.x() < result.width() and p2.y() < result.height())
+            auto f = [p1,p2](float x)->float
             {
-                p2 *= 1.1;
-            }
+               float y1 = p1.y();
+               float y2 = p2.y();
+               float x1 = p1.x();
+               float x2 = p2.x();
 
-            if (p1 != QPointF(0,0))
-            {
-                while (p1.x() > 0 and p1.y() > 0)
-                {
-                    p1 -= QPointF(1,1);
-                }
-            }
+               float k = (y2 - y1) / (x2 - x1);
+
+               return (x - x1) * k + y1;
+            };
+
+            QPointF firstPoint(0,f(0));
+            QPointF secondPoint(255,f(255));
 
             QPen pen(QBrush(QColor(Qt::red)),3,Qt::SolidLine,Qt::RoundCap);
-            projectionScene->addLine({p1, p2}, pen);
+            projectionScene->addLine({firstPoint, secondPoint}, pen);
         }
     }
 }

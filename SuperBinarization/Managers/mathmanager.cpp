@@ -1,6 +1,7 @@
 #include "mathmanager.h"
 #include <cmath>
 #include <algorithm>
+#include <QDebug>
 
 void MathManager::rgb2lab(float R, float G, float B, float &l_s, float &a_s, float &b_s)
 {
@@ -178,7 +179,8 @@ pointPosOverPlane MathManager::beyondThePlane(const QVector3D &point)
     float D = std::get<3>(currentPlane);
 
     float value = A * point.x() + B * point.y() + C * point.z() - D;
-    if (std::abs(value) < 10)
+//    qDebug () << "value = " << value;
+    if (std::abs(value) < 200)
     {
         return pointPosOverPlane::into;
     }
