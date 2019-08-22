@@ -20,6 +20,7 @@ AppStorage::AppStorage()
     planeConsts = std::make_tuple(123, 1, -1, 1);
     currentAngleVector = 0;
     basisIsFilled = false;
+    colorModel = colorModel::RGB;
 }
 
 ClassModel& AppStorage::currentModel()

@@ -36,7 +36,8 @@ public:
     planeABCD planeConsts;
     QMap<colorModel, QVector<vector6D>> points3D;
     QVector<QRgb> beyondedRgb;
-    QVector<QVector3D> redLineBasis;
+    QVector<QPointF> redLineBasis;
+    colorModel colorModel;
     bool basisIsFilled;
 };
 

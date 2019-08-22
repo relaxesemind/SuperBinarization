@@ -7,6 +7,7 @@
 #include <QColorDialog>
 
 const float defaultWidht = 325.f;
+bool planeRecalcFlag = true;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,8 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
     drawComponentsAxis();
 
     QPixmap image;
-//    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
-    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
+    image.load("/Users/ivanovegor/Desktop/maxresdefault.jpg");
+//    image.load("C:/Users/relaxes/Documents/MEPHI/46_KAF/primery_izobrazheniy_dlya_UIR/костный мозг  F0000055.bmp");
     ui->imageView->setImage(image.toImage());
 
     ui->tabWidget->setMinimumWidth(defaultWidht);
@@ -324,6 +325,8 @@ void MainWindow::drawRGB()
 
     QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
     item2->setPos(offset,-256);
+
+    storage.colorModel = colorModel::RGB;
 }
 
 void MainWindow::drawHSV()
@@ -344,6 +347,7 @@ void MainWindow::drawHSV()
 
     QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
     item2->setPos(offset,-256);
+    AppStorage::shared().colorModel = colorModel::HSV;
 }
 
 void MainWindow::drawLAB()
@@ -364,6 +368,7 @@ void MainWindow::drawLAB()
 
     QGraphicsPixmapItem *item2 = componentsScenes[2]->addPixmap(QPixmap::fromImage(BR));
     item2->setPos(offset,-256);
+    AppStorage::shared().colorModel = colorModel::LAB;
 }
 
 
@@ -530,24 +535,22 @@ QRgb rgbFromVector3D(const QVector3D& vector)
     return color.rgb();
 }
 
-bool flag = true;
-
 void MainWindow::on_pushButton_clicked()
 {
-    colorModel color_model = colorModel::RGB;
-    byThreeComponents(color_model);
     auto& storage = AppStorage::shared();
-    auto& points = *storage.points3D.find(color_model);
     auto& math = ManagersLocator::shared().mathManager;
     auto& beyonded = storage.beyondedRgb;
-    auto& redLineBasis = AppStorage::shared().redLineBasis;
+    auto& redLineBasis = storage.redLineBasis;
     beyonded.clear();
     redLineBasis.clear();
-
+    colorModel color_model = storage.colorModel;
+    auto& points = *storage.points3D.find(color_model);
+    byThreeComponents(color_model);
     QImage sourceImage = ui->imageView->getImage();
 
     QImage result(256, 256, QImage::Format_RGB32);
     result.fill(Qt::white);
+    projectionScene->clear();
 
     if (points.isEmpty())
     {
@@ -555,11 +558,12 @@ void MainWindow::on_pushButton_clicked()
     }
 
 
-    if (flag)
+    if (planeRecalcFlag)
     {
-        AppStorage::shared().planeConsts = math.defaultPlane(color_model);
-        AppStorage::shared().currentVisionVector = math.defaultVisionVector(color_model);
-        flag = false;
+        storage.planeConsts = math.defaultPlane(color_model);
+        storage.currentVisionVector = math.defaultVisionVector(color_model);
+        ui->horizontalSlider->setValue(0);
+        planeRecalcFlag = false;
     }
 
     updatePlaneLabel();
@@ -570,20 +574,25 @@ void MainWindow::on_pushButton_clicked()
         vector6D p = *point;
         QRgb color = p.second;
         QVector3D projectPoint = math.projectionOfPointIntoPlane(p.first, storage.currentVisionVector);
-        bool beyond = math.beyondThePlane(projectPoint);
+        pointPosOverPlane pointPosition = math.beyondThePlane(projectPoint);
         QPoint local = math.projectionInLocalCoordinates(projectPoint).toPoint();
 
-        if (beyond)
-        {
-            color = QColor(Qt::black).rgb(); //highlightColor(color);
-            QRgb rgb = rgbFromVector3D(p.first);
-            beyonded.append(rgb);
-        }
+//        if (pointPosition == pointPosOverPlane::front)
+//        {
+//            color = QColor(Qt::black).rgb(); //highlightColor(color);
+//            QRgb rgb = rgbFromVector3D(p.first);
+//            beyonded.append(rgb);
+//        }
 
         if (local.x() > result.width() - 1 or local.x() < 0 or
                 local.y() < 0 or local.y() > result.height() - 1)
         {
             continue;
+        }
+
+        if (pointPosition == pointPosOverPlane::into)
+        {
+           storage.redLineBasis.append(local);
         }
 
         int x = local.x();
@@ -593,6 +602,30 @@ void MainWindow::on_pushButton_clicked()
     }
 
     projectionScene->addPixmap(QPixmap::fromImage(result));
+
+    if (storage.redLineBasis.count() >= 2)
+    {
+        QPointF p1 = storage.redLineBasis.first();
+        QPointF p2 = storage.redLineBasis.last();
+        if (p1 != p2 and p2 != QPointF(0,0))
+        {
+            while (p2.x() < result.width() and p2.y() < result.height())
+            {
+                p2 *= 1.1;
+            }
+
+            if (p1 != QPointF(0,0))
+            {
+                while (p1.x() > 0 and p1.y() > 0)
+                {
+                    p1 -= QPointF(1,1);
+                }
+            }
+
+            QPen pen(QBrush(QColor(Qt::red)),3,Qt::SolidLine,Qt::RoundCap);
+            projectionScene->addLine({p1, p2}, pen);
+        }
+    }
 }
 
 void MainWindow::on_lineEdit_5_editingFinished()
@@ -604,9 +637,9 @@ void MainWindow::on_lineEdit_5_editingFinished()
     if (ok)
     {
         currentA = value;
+        updatePlaneLabel();
+       // planeRecalcFlag = true;
     }
-
-    updatePlaneLabel();
 }
 
 void MainWindow::on_lineEdit_6_editingFinished()
@@ -619,6 +652,7 @@ void MainWindow::on_lineEdit_6_editingFinished()
     {
         currentA = value;
         updatePlaneLabel();
+      //  planeRecalcFlag = true;
     }
 }
 
@@ -632,6 +666,7 @@ void MainWindow::on_lineEdit_8_editingFinished()
     {
         currentA = value;
         updatePlaneLabel();
+       // planeRecalcFlag = true;
     }
 
 }
@@ -646,6 +681,7 @@ void MainWindow::on_lineEdit_7_editingFinished()
     {
         currentA = value;
         updatePlaneLabel();
+       // planeRecalcFlag = true;
     }
 }
 
@@ -659,6 +695,11 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
     auto& math = ManagersLocator::shared().mathManager;
     auto& vector = AppStorage::shared().currentVisionVector;
     int delta = value - AppStorage::shared().currentAngleVector;
+    if (delta == 0)
+    {
+        return;
+    }
+
     AppStorage::shared().currentAngleVector += delta;
     vector = math.rotateVisionVector(delta);
     updateVisionLabel();

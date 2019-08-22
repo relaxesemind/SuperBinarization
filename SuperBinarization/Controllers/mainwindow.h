@@ -64,6 +64,7 @@ private:
     std::array<QGraphicsScene *, 3> componentsScenes;
     QGraphicsScene *projectionScene;
     QImage currentProjections[3];
+    QGraphicsItem *redLine;
 
 private:
     void updateClassListWidget();

@@ -6,6 +6,13 @@
 #include <QVector2D>
 #include "Models/appstorage.h"
 
+enum pointPosOverPlane
+{
+    front,
+    behind,
+    into
+};
+
 class MathManager
 {
 public:
@@ -18,7 +25,7 @@ public:
     QVector3D Xspin(QVector3D vector, int degrees);
     QVector3D Yspin(QVector3D vector, int degrees);
     QVector3D point3D(QRgb XY, QRgb YZ, QRgb XZ);
-    bool beyondThePlane(const QVector3D& point);
+    pointPosOverPlane beyondThePlane(const QVector3D& point);
     QVector3D findMiddlePoint(colorModel colorModel);
     planeABCD defaultPlane(colorModel colorModel);
     QVector3D defaultVisionVector(colorModel colorModel);

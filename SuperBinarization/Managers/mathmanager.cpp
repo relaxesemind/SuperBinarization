@@ -169,7 +169,7 @@ QVector3D MathManager::point3D(QRgb XY, QRgb YZ, QRgb XZ)
     return QVector3D(qRed(XY),qGreen(XY),qBlue(XY));
 }
 
-bool MathManager::beyondThePlane(const QVector3D &point)
+pointPosOverPlane MathManager::beyondThePlane(const QVector3D &point)
 {
     auto& currentPlane = AppStorage::shared().planeConsts;
     float A = std::get<0>(currentPlane);
@@ -178,12 +178,12 @@ bool MathManager::beyondThePlane(const QVector3D &point)
     float D = std::get<3>(currentPlane);
 
     float value = A * point.x() + B * point.y() + C * point.z() - D;
-    if (std::abs(value) < 0.3)
+    if (std::abs(value) < 10)
     {
-        AppStorage::shared().redLineBasis.append(point);
+        return pointPosOverPlane::into;
     }
 
-    return value > 0;
+    return value > 0 ? pointPosOverPlane::front : pointPosOverPlane::behind;
 }
 
 QVector3D MathManager::findMiddlePoint(colorModel colorModel)
@@ -234,7 +234,7 @@ planeABCD MathManager::defaultPlane(colorModel colorModel)
 QVector3D MathManager::defaultVisionVector(colorModel colorModel)
 {
     QVector3D M = findMiddlePoint(colorModel);
-    return M * 2;
+    return M * 3;
 }
 
 QVector3D MathManager::rotateVisionVector(float angle)
